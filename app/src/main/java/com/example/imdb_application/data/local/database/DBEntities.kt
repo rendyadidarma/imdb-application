@@ -26,7 +26,7 @@ data class MovieEntity constructor(
     val year: String
 )
 
-
+// TODO: Buat class Mapper
 // Movie Item to Domain
 fun List<MovieEntity>.asDomainModel(): List<Movie> {
     return map {
