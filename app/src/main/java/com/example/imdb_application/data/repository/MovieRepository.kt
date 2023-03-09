@@ -8,6 +8,9 @@ import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.remote.api.APINetwork
 import com.example.imdb_application.data.utils.MovieObjectMapper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class MovieRepository(private val database: MovieDatabase) {
@@ -16,11 +19,8 @@ class MovieRepository(private val database: MovieDatabase) {
         MovieObjectMapper.mapMovieEntityListToMovieList(it)
     }
 
-    fun getMovieDetail(id : String) : LiveData<Movie> {
-        val getMovieDetail = database.movieDao.getMovie(id)
-        return Transformations.map(getMovieDetail.asLiveData()) {
-            MovieObjectMapper.mapMovieEntityToMovie(it)
-        }
+    fun getMovieDetail(id : String) : Flow<Movie> {
+        return database.movieDao.getMovie(id).map { MovieObjectMapper.mapMovieEntityToMovie(it) }
     }
 
     suspend fun refreshMovies() {

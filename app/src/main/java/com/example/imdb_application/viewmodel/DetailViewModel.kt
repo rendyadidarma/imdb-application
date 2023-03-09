@@ -2,11 +2,7 @@ package com.example.imdb_application.viewmodel
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.example.imdb_application.data.local.database.MovieDatabase
 import com.example.imdb_application.data.local.database.MovieEntity
 import com.example.imdb_application.data.model.Movie
@@ -21,7 +17,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val movieInDetail : LiveData<Movie> get()  = _movieInDetail
 
     fun setMovieInDetail(id : String) {
-        _movieInDetail.value = movieRepository.getMovieDetail(id).value
+        _movieInDetail.value = movieRepository.getMovieDetail(id).asLiveData().value
         _movieInDetail.value?.let { Log.d("Success get Data", it.fullTitle) }
     }
 
