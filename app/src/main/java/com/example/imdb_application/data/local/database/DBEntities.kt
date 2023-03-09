@@ -25,15 +25,3 @@ data class MovieEntity constructor(
     val title: String,
     val year: String
 )
-
-// TODO: Buat class Mapper
-// Movie Item to Domain
-fun List<MovieEntity>.asDomainModel(): List<Movie> {
-    return map {
-        Movie(
-            fullTitle = it.fullTitle,
-            id = it.id,
-            image = it.image
-        )
-    }
-}

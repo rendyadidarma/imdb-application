@@ -9,6 +9,9 @@ interface MovieDao {
     @Query("select * from movie_table")
     fun getMovies(): Flow<List<MovieEntity>>
 
+    @Query("select * from movie_table where id=:id")
+    fun getMovie(id: String): Flow<MovieEntity>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(movies: List<MovieEntity>)
 }

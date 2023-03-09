@@ -2,19 +2,13 @@ package com.example.imdb_application.view
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.imdb_application.R
 import com.example.imdb_application.databinding.ActivityMainBinding
-import com.example.imdb_application.viewmodel.HomeViewModel
+import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -23,6 +17,10 @@ class MainActivity : AppCompatActivity() {
 
 
     private lateinit var binding: ActivityMainBinding
+
+    fun getBottomNavView(): BottomNavigationView {
+        return binding.bottomNav
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,5 +33,12 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
 
         binding.bottomNav.setupWithNavController(navController)
+
+        setupActionBarWithNavController(this, navController)
     }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
 }

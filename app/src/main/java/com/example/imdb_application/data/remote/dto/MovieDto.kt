@@ -31,26 +31,3 @@ data class MovieDto(
     val title: String,
     val year: String
 )
-
-fun ItemsMovieContainer.asDatabaseModel() : List<MovieEntity> {
-    return movies.map {
-        MovieEntity(
-            contentRating = it.contentRating,
-            directors = it.directors,
-            fullTitle = it.fullTitle,
-            genres = it.genres,
-            id = it.id,
-            imDbRating = it.imDbRating,
-            imDbRatingCount = it.imDbRatingCount,
-            image = it.image,
-            plot = it.plot,
-            releaseState = it.releaseState,
-            runtimeStr = it.runtimeStr,
-            stars = it.stars,
-            title = it.title,
-            year = it.year
-        )
-    }
-}
-
-// TODO: Make an Database Model and Convert Dto to DB model

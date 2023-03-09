@@ -20,9 +20,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     val alreadyHasData : LiveData<Boolean> get() = _alreadyHasData
 
-    private var _movieInDetail = MutableLiveData<Movie>()
-
-    val movieInDetail : LiveData<Movie> get() = _movieInDetail
 
     init {
         refreshDataFromRepo()
@@ -39,9 +36,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun onMovieClicked(movie : Movie) {
-        _movieInDetail.value = movie
-    }
 
     class Factory(val app: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
