@@ -5,4 +5,13 @@
     <string name="home_string">Home</string>
     <string name="search_string">Search</string>
     <string name="about_string">About</string>
+    <string name="release">Release</string>
+    <string name="duration">Duration</string>
+    <string name="content_rating">Content Rating</string>
+    <string name="imdb_rating">IMDb Rating</string>
+    <string name="directors">Directors</string>
+    <string name="stars">Stars</string>
+    <string name="genres">Genres</string>
+    <string name="detail_fragment_image">Detail Fragment Image</string>
+    <string name="format_rating_count">(%s)</string>
 </resources>

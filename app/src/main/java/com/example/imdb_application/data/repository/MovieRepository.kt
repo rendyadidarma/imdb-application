@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.asLiveData
 import com.example.imdb_application.data.local.database.MovieDatabase
+import com.example.imdb_application.data.local.database.MovieEntity
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.remote.api.APINetwork
 import com.example.imdb_application.data.utils.MovieObjectMapper
@@ -19,8 +20,8 @@ class MovieRepository(private val database: MovieDatabase) {
         MovieObjectMapper.mapMovieEntityListToMovieList(it)
     }
 
-    fun getMovieDetail(id : String) : Flow<Movie> {
-        return database.movieDao.getMovie(id).map { MovieObjectMapper.mapMovieEntityToMovie(it) }
+    suspend fun getMovieDetail(id : String) : Flow<MovieEntity> {
+        return database.movieDao.getMovie(id)
     }
 
     suspend fun refreshMovies() {

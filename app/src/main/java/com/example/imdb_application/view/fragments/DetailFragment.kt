@@ -1,20 +1,18 @@
 package com.example.imdb_application.view.fragments
 
-import android.app.Notification.Action
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
-import com.example.imdb_application.R
 import com.example.imdb_application.databinding.FragmentDetailBinding
+import com.example.imdb_application.view.MainActivity
 import com.example.imdb_application.viewmodel.DetailViewModel
-import com.example.imdb_application.viewmodel.HomeViewModel
+
 
 class DetailFragment : Fragment() {
 
@@ -34,12 +32,25 @@ class DetailFragment : Fragment() {
     ): View? {
         Log.d("OnDetail", "Enter On Detail")
         val binding = FragmentDetailBinding.inflate(inflater)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
 
-        Log.d("inDetail", args.movieId)
         viewModel.setMovieInDetail(args.movieId)
+        getCurrentActivity()?.setSupportActionBar(binding.toolbar)
+
+        binding.toolbar.setNavigationOnClickListener {
+            getCurrentActivity()?.onSupportNavigateUp()
+        }
+
+//        if(getCurrentActivity()?.supportActionBar != null) {
+//            getCurrentActivity()?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//            getCurrentActivity()?.supportActionBar?.setDisplayShowHomeEnabled(true)
+//        }
 
         return binding.root
     }
 
-
+    private fun getCurrentActivity(): MainActivity? {
+        return (activity as? MainActivity)
+    }
 }

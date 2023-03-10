@@ -9,6 +9,7 @@ import com.example.imdb_application.R
 import com.example.imdb_application.databinding.ActivityMainBinding
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.android.synthetic.main.fragment_detail.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.bottomNav.setupWithNavController(navController)
 
-        setupActionBarWithNavController(this, navController)
+//        setupActionBarWithNavController(this, navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {
