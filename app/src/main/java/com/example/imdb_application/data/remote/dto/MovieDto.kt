@@ -10,6 +10,18 @@ import com.squareup.moshi.JsonClass
 data class ItemsMovieContainer(@Json(name = "items") val movies: List<MovieDto>)
 
 @JsonClass(generateAdapter = true)
+data class ResultsMovieContainer(@Json(name = "results") val moviesForSearch: List<MovieDtoSearch>)
+
+@JsonClass(generateAdapter = true)
+data class MovieDtoSearch(
+    val id: String,
+    val resultType: String,
+    val image : String,
+    val title : String,
+    val description : String
+)
+
+@JsonClass(generateAdapter = true)
 data class MovieDto(
     val contentRating: String,
     val directorList: List<Director>,

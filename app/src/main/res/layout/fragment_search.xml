@@ -1,14 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".view.fragments.SearchFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.imdb_application.viewmodel.SearchViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        tools:context=".view.fragments.SearchFragment">
 
-</FrameLayout>
+        <EditText
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:padding="4dp"
+            android:lines="1"
+            android:hint="@string/search_imdb"
+            android:textColor="@color/black"
+            android:textColorHint="@color/background"
+            android:drawableStart="@drawable/icon_search_24"
+            android:background="@color/white"
+            android:text="@{viewModel.keyword}"
+            app:textChangeListener="@{viewModel}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_frame_layout_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:shimmer_duration="1000"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/search_view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:onLoadSearch="@{viewModel.searchStatus}"
+            app:recyclerViews="@{searchRecyclerView}"
+            app:imageViews="@{noDataPlaceHolder}"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <include layout="@layout/shimmer_placeholder_layout" />
+                <include layout="@layout/shimmer_placeholder_layout" />
+                <include layout="@layout/shimmer_placeholder_layout" />
+                <include layout="@layout/shimmer_placeholder_layout" />
+                <include layout="@layout/shimmer_placeholder_layout" />
+                <include layout="@layout/shimmer_placeholder_layout" />
+                <include layout="@layout/shimmer_placeholder_layout" />
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+        <ImageView
+            android:id="@+id/noDataPlaceHolder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="40dp"
+            android:src="@drawable/search_fragment_icon_woman_searching"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/search_view" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/searchRecyclerView"
+            listOfData="@{viewModel.searchData}"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:padding="8dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/search_view"
+            app:spanCount="2"
+            tools:listitem="@layout/list_view_item" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

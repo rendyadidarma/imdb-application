@@ -1,34 +1,55 @@
 package com.example.imdb_application.view.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.imdb_application.R
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.example.imdb_application.databinding.FragmentSearchBinding
+import com.example.imdb_application.view.adapter.MovieListAdapter
+import com.example.imdb_application.view.adapter.MovieListener
+import com.example.imdb_application.viewmodel.SearchViewModel
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [SearchFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class SearchFragment : Fragment(R.layout.fragment_search) {
+class SearchFragment : Fragment(com.example.imdb_application.R.layout.fragment_search) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
+    private val viewModel: SearchViewModel by lazy {
+        val activity = requireNotNull(this.activity) {
+            "You can access the vmodel after onActivityCreated()"
+        }
+        ViewModelProvider(
+            this,
+            SearchViewModel.Factory(activity.application)
+        ).get(SearchViewModel::class.java)
+    }
+
+    private lateinit var binding : FragmentSearchBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false)
+
+        binding = FragmentSearchBinding.inflate(inflater)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+
+        binding.searchRecyclerView.adapter = MovieListAdapter(
+            MovieListener {
+                Log.d("Search Item", "Clicked!")
+            }
+        )
+
+        return binding.root
     }
+
 
 }

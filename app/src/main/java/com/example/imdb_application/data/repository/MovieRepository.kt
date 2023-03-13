@@ -7,6 +7,7 @@ import com.example.imdb_application.data.local.database.MovieDatabase
 import com.example.imdb_application.data.local.database.MovieEntity
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.remote.api.APINetwork
+import com.example.imdb_application.data.remote.dto.MovieDtoSearch
 import com.example.imdb_application.data.utils.MovieObjectMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -14,21 +15,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-class MovieRepository(private val database: MovieDatabase) {
+interface MovieRepository {
 
-    val movies : LiveData<List<Movie>> = Transformations.map(database.movieDao.getMovies().asLiveData()) {
-        MovieObjectMapper.mapMovieEntityListToMovieList(it)
-    }
+    fun getMovieFromDatabase() : LiveData<List<Movie>>
 
-    suspend fun getMovieDetail(id : String) : Flow<MovieEntity> {
-        return database.movieDao.getMovie(id)
-    }
+    fun getMovieDetail(id : String) : Flow<MovieEntity>
 
-    suspend fun refreshMovies() {
-        withContext(Dispatchers.IO) {
-            val moviesList = APINetwork.movies.getMovieInTheaters()
-            database.movieDao.insertAll(MovieObjectMapper.mapMovieDtoToMovieEntity(moviesList.movies))
-        }
-    }
+    suspend fun refreshMovies()
 
+//    suspend fun getMovieFromNetwork(keyword : String) : List<MovieDtoSearch>
 }

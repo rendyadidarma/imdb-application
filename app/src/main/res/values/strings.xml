@@ -13,5 +13,6 @@
     <string name="stars">Stars</string>
     <string name="genres">Genres</string>
     <string name="detail_fragment_image">Detail Fragment Image</string>
-    <string name="format_rating_count">(%s)</string>
+    <string name="posterImage">poster %s</string>
+    <string name="search_imdb">Search IMDb</string>
 </resources>

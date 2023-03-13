@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -16,6 +15,7 @@ import com.example.imdb_application.view.MainActivity
 import com.example.imdb_application.view.adapter.MovieListAdapter
 import com.example.imdb_application.view.adapter.MovieListener
 import com.example.imdb_application.viewmodel.HomeViewModel
+import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
@@ -23,7 +23,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val activity = requireNotNull(this.activity) {
             "You can access the vmodel after onActivityCreated()"
         }
-        ViewModelProvider(this, HomeViewModel.Factory(activity.application)).get(HomeViewModel::class.java)
+        ViewModelProvider(
+            this,
+            HomeViewModel.Factory(activity.application)
+        ).get(HomeViewModel::class.java)
     }
 
 //    private var viewModelAdapter: MovieListAdapter? = null
@@ -32,7 +35,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         super.onCreate(savedInstanceState)
     }
 
-    private var binding : FragmentHomeBinding? = null
+    private var binding: FragmentHomeBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,11 +62,21 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         binding!!.homeRecyclerView.adapter = MovieListAdapter(
             MovieListener { movie ->
-                val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment().setMovieId(movie.id)
-                findNavController().navigate(action)
+
+                val action =
+                    HomeFragmentDirections.actionHomeFragmentToDetailFragment().setMovieId(movie.id)
+                findNavController().navigate(
+                    action
+                )
+
                 getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
             }
         )
+
+        binding!!.swipeRefresh.setOnRefreshListener {
+            viewModel.refreshDataFromRepo()
+            swipe_refresh.isRefreshing = false
+        }
 
         return binding!!.root
     }
@@ -71,6 +84,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun getCurrentActivity(): MainActivity? {
         return (activity as? MainActivity)
     }
+
     override fun onStart() {
         super.onStart()
         binding!!.shimmerFrameLayout.startShimmer()

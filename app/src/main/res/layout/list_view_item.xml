@@ -9,6 +9,9 @@
         <variable
             name="clickListener"
             type="com.example.imdb_application.view.adapter.MovieListener" />
+        <variable
+            name="view"
+            type="com.example.imdb_application.view.adapter.MovieListAdapter.MovieViewHolder" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -32,6 +35,7 @@
                 android:id="@+id/movie_image"
                 android:layout_width="wrap_content"
                 android:layout_height="175dp"
+                android:transitionName="@{@string/posterImage(String.valueOf(movie.id))}"
                 android:scaleType="fitCenter"
                 android:layout_weight="1"
                 android:layout_gravity="center"

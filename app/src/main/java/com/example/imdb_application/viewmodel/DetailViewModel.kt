@@ -7,13 +7,14 @@ import com.example.imdb_application.data.local.database.MovieDatabase
 import com.example.imdb_application.data.local.database.MovieEntity
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.repository.MovieRepository
+import com.example.imdb_application.data.repository.MovieRepositoryImpl
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val movieRepository = MovieRepository(MovieDatabase.getDatabase(application))
+    private val movieRepository = MovieRepositoryImpl(MovieDatabase.getDatabase(application))
 
     private var _movieInDetail = MutableLiveData<MovieEntity>()
 
