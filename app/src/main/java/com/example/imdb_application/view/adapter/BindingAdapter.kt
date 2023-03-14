@@ -42,15 +42,20 @@ fun bindRecyclerView(
     adapter.submitList(data)
 }
 
-@BindingAdapter(value = ["shimmerStatus", "onLoadSearch", "recyclerViews", "imageViews"], requireAll = false)
-fun bindShimmer(shimmerFrameLayout: ShimmerFrameLayout, hasData: Boolean?, onLoadSearch: LiveData<STATUS>?, recyclerViews: RecyclerView?, imageViews : ImageView?) {
+@BindingAdapter(value = ["shimmerStatus", "onLoadSearch", "recyclerViews", "imageViews", "dbEmpty"], requireAll = false)
+fun bindShimmer(shimmerFrameLayout: ShimmerFrameLayout, hasData: Boolean?, onLoadSearch: LiveData<STATUS>?, recyclerViews: RecyclerView?, imageViews : ImageView?, dbEmpty : Boolean?) {
     if(hasData != null) {
         when (hasData) {
             true -> {
                 shimmerFrameLayout.visibility = View.GONE
                 shimmerFrameLayout.stopShimmer()
+                if(dbEmpty != null && dbEmpty == true)
+                    imageViews?.visibility = View.VISIBLE
+                else
+                    imageViews?.visibility = View.GONE
             }
             false -> {
+                imageViews?.visibility = View.GONE
                 shimmerFrameLayout.visibility = View.VISIBLE
                 shimmerFrameLayout.startShimmer();
             }

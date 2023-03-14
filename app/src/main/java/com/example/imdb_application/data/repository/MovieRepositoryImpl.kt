@@ -1,5 +1,9 @@
 package com.example.imdb_application.data.repository
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.asLiveData
@@ -10,16 +14,37 @@ import com.example.imdb_application.data.model.MovieDetail
 import com.example.imdb_application.data.remote.api.APIService
 import com.example.imdb_application.data.remote.dto.detail.DetailDto
 import com.example.imdb_application.data.utils.MovieObjectMapper
+import com.example.imdb_application.data.utils.NetworkChecker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class MovieRepositoryImpl(private val database: MovieDatabase, private val network: APIService) : MovieRepository {
 
-    override fun getMovieFromDatabase() : LiveData<List<Movie>> {
-        return Transformations.map(database.movieDao.getMovies().asLiveData()) {
-            MovieObjectMapper.mapMovieEntityListToMovieList(it)
+
+    //TODO: Inet -> Ambil Data -> Update DB -> Tampilin Data
+    //TODO: No Inet -> Check DB [DB Kosong -> Tampilin Empty State] [DB Berisi -> Tampilin Data]
+    override suspend fun getMovies(context: Context): Flow<List<Movie>>? {
+        // 1
+        if(NetworkChecker.isOnline(context)) {
+            withContext(Dispatchers.IO) {
+                val  moviesList = network.getMovieInTheaters()
+                database.movieDao.insertAll(MovieObjectMapper.mapMovieDtoToMovieEntity(moviesList.movies))
+            }
+        } else if (!NetworkChecker.isOnline(context)) { // 2
+            val emptyDb = isDatabaseEmpty().first()
+            if(emptyDb) {
+                return null
+            }
         }
+
+        return database.movieDao.getMovies().map { MovieObjectMapper.mapMovieEntityListToMovieList(it) }
+    }
+
+    override fun isDatabaseEmpty() : Flow<Boolean> {
+        return database.movieDao.isTableEmpty()
     }
 
     // From Database
@@ -36,6 +61,10 @@ class MovieRepositoryImpl(private val database: MovieDatabase, private val netwo
             val moviesList = network.getMovieInTheaters()
             database.movieDao.insertAll(MovieObjectMapper.mapMovieDtoToMovieEntity(moviesList.movies))
         }
+    }
+
+    override suspend fun getMoviesFromNetwork() : List<Movie> {
+        return MovieObjectMapper.mapMovieDtoListToMovieList(network.getMovieInTheaters().movies)
     }
 
 

@@ -14,6 +14,9 @@ interface MovieDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(movies: List<MovieEntity>)
+
+    @Query("select (select count(*) from movie_table) == 0")
+    fun isTableEmpty() : Flow<Boolean>
 }
 
 @Database(entities = [MovieEntity::class], version = 1)

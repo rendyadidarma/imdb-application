@@ -1,6 +1,7 @@
 package com.example.imdb_application.view.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.imdb_application.R
+import com.example.imdb_application.data.utils.NetworkChecker
 import com.example.imdb_application.data.utils.Router
 import com.example.imdb_application.databinding.FragmentHomeBinding
 import com.example.imdb_application.view.MainActivity
@@ -63,8 +65,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         binding!!.homeRecyclerView.adapter = MovieListAdapter(
             MovieListener { movie ->
-                Router.routeHomeFragmentToDetailFragment(movie, findNavController())
-                getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
+                if(NetworkChecker.isOnline(requireContext())) {
+                    Router.routeHomeFragmentToDetailFragment(movie, findNavController())
+                    getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
+                } else {
+                    Log.d("Internet Loss", "Can't go to detail, because No Internet Connection Detected")
+                }
             }
         )
 

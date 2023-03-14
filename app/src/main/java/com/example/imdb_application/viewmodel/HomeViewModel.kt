@@ -4,8 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.imdb_application.data.local.database.MovieDatabase
+import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.remote.api.APINetwork
 import com.example.imdb_application.data.repository.MovieRepositoryImpl
+import com.example.imdb_application.data.utils.NetworkChecker
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -13,26 +17,37 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val movieRepository = MovieRepositoryImpl(MovieDatabase.getDatabase(application), APINetwork.movies)
 
-    val movieList = movieRepository.getMovieFromDatabase()
+    private var _movieList = MutableLiveData<List<Movie>>()
+
+    val movieList : LiveData<List<Movie>> get() = _movieList
 
     private var _alreadyHasData = MutableLiveData<Boolean>(false)
 
     val alreadyHasData : LiveData<Boolean> get() = _alreadyHasData
+
+    private var _dbEmpty = MutableLiveData<Boolean>()
+
+    val dbEmpty: LiveData<Boolean> get() = _dbEmpty
 
     init {
         refreshDataFromRepo()
     }
 
     private fun _refreshDataFromRepo() {
-        Log.d("refresh Data", "Refreshing...")
         viewModelScope.launch {
             _alreadyHasData.value = false
-            try {
-                movieRepository.refreshMovies()
-                _alreadyHasData.value = true
-            } catch (error: IOException) {
-                Log.w("Error", "Error Detected in Home View Model Refresh fun")
-            }
+                try {
+                    val list = movieRepository.getMovies(getApplication())
+                    if(list != null) {
+                        _movieList.value = list.first()
+                        _dbEmpty.value = false
+                    } else {
+                        _dbEmpty.value = true
+                    }
+                    _alreadyHasData.value = true
+                } catch (error: IOException) {
+                    Log.w("ErrorInHomeViewModel", "Error Detected in Home View Model Refresh fun")
+                }
         }
     }
 

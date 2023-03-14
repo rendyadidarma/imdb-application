@@ -11,6 +11,7 @@ import com.example.imdb_application.data.remote.api.APINetwork
 import com.example.imdb_application.data.remote.api.APIService
 import com.example.imdb_application.data.repository.MovieRepository
 import com.example.imdb_application.data.repository.MovieRepositoryImpl
+import com.example.imdb_application.data.utils.NetworkChecker
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
