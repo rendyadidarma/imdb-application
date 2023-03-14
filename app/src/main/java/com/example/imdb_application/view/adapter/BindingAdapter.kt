@@ -85,7 +85,7 @@ fun bindShimmer(shimmerFrameLayout: ShimmerFrameLayout, hasData: Boolean?, onLoa
 }
 
 @BindingAdapter("textChangeListener")
-fun textChangeListener(view: EditText, viewModel: SearchViewModel) {
+fun textChangeListener(view: EditText, getNetwork: (keyword : String) -> Job) {
 
     var job: Job? = null
 
@@ -100,7 +100,7 @@ fun textChangeListener(view: EditText, viewModel: SearchViewModel) {
         override fun afterTextChanged(p0: Editable?) {
             if (!p0.isNullOrEmpty()) {
                 val input = p0.toString()
-                job = viewModel.getMovieFromNetwork(input)
+                job = getNetwork(input)
             }
         }
 

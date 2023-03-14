@@ -15,7 +15,7 @@ class MovieListAdapter(private val clickListener: MovieListener) : ListAdapter<M
         }
 
         override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {
-            return oldItem.image == newItem.image && oldItem.fullTitle == newItem.fullTitle
+            return oldItem.image == newItem.image && oldItem.fullTitle == newItem.fullTitle && oldItem.id == newItem.id
         }
 
     }
@@ -39,7 +39,6 @@ class MovieListAdapter(private val clickListener: MovieListener) : ListAdapter<M
         val itemMovie = getItem(position)
         holder.bind(clickListener, itemMovie)
     }
-
 }
 
 class MovieListener(val clickListener: (movie: Movie) -> Unit) {

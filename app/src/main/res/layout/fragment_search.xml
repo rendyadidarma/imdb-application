@@ -27,7 +27,7 @@
             android:drawableStart="@drawable/icon_search_24"
             android:background="@color/white"
             android:text="@{viewModel.keyword}"
-            app:textChangeListener="@{viewModel}"
+            app:textChangeListener="@{viewModel.fetchSearchData}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

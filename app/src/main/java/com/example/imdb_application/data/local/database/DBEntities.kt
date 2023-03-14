@@ -6,6 +6,7 @@ import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.remote.dto.Director
 import com.example.imdb_application.data.remote.dto.Genre
 import com.example.imdb_application.data.remote.dto.Star
+import kotlinx.android.parcel.Parcelize
 
 @Entity("movie_table")
 data class MovieEntity constructor(

@@ -4,13 +4,14 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.imdb_application.data.local.database.MovieDatabase
+import com.example.imdb_application.data.remote.api.APINetwork
 import com.example.imdb_application.data.repository.MovieRepositoryImpl
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val movieRepository = MovieRepositoryImpl(MovieDatabase.getDatabase(application))
+    private val movieRepository = MovieRepositoryImpl(MovieDatabase.getDatabase(application), APINetwork.movies)
 
     val movieList = movieRepository.getMovieFromDatabase()
 

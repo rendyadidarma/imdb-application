@@ -21,7 +21,6 @@
         app:cardElevation="4dp"
         android:layout_margin="8dp"
         app:cardCornerRadius="8dp"
-
         android:onClick="@{() -> clickListener.onClick(movie)}"
         >
 

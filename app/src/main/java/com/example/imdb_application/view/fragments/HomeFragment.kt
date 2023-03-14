@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.imdb_application.R
+import com.example.imdb_application.data.utils.Router
 import com.example.imdb_application.databinding.FragmentHomeBinding
 import com.example.imdb_application.view.MainActivity
 import com.example.imdb_application.view.adapter.MovieListAdapter
@@ -62,13 +63,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         binding!!.homeRecyclerView.adapter = MovieListAdapter(
             MovieListener { movie ->
-
-                val action =
-                    HomeFragmentDirections.actionHomeFragmentToDetailFragment().setMovieId(movie.id)
-                findNavController().navigate(
-                    action
-                )
-
+                Router.routeHomeFragmentToDetailFragment(movie, findNavController())
                 getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
             }
         )

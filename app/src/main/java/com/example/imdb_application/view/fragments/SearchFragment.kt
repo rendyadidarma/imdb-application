@@ -7,8 +7,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
+import com.example.imdb_application.R
+import com.example.imdb_application.data.utils.Router
 import com.example.imdb_application.databinding.FragmentSearchBinding
 import com.example.imdb_application.view.adapter.MovieListAdapter
 import com.example.imdb_application.view.adapter.MovieListener
@@ -42,9 +47,22 @@ class SearchFragment : Fragment(com.example.imdb_application.R.layout.fragment_s
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
+        val verticalDecorator = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
+        val horizontalDecorator = DividerItemDecoration(activity, DividerItemDecoration.HORIZONTAL)
+
+        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.divider_recycler, null)
+
+        if (drawable != null) {
+            verticalDecorator.setDrawable(drawable)
+            horizontalDecorator.setDrawable(drawable)
+            binding!!.searchRecyclerView.addItemDecoration(verticalDecorator)
+            binding!!.searchRecyclerView.addItemDecoration(horizontalDecorator)
+        }
+
+
         binding.searchRecyclerView.adapter = MovieListAdapter(
             MovieListener {
-                Log.d("Search Item", "Clicked!")
+                Router.routeSearchFragmentToDetailFragment(movie = it, findNavController())
             }
         )
 

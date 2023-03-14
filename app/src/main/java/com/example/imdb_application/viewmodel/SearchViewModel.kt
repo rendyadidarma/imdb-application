@@ -21,11 +21,7 @@ enum class STATUS {
 
 class SearchViewModel(application: Application) : AndroidViewModel(application) {
 
-    init {
-
-    }
-
-    private val movieRepository = MovieRepositoryImpl(MovieDatabase.getDatabase(application))
+    private val movieRepository = MovieRepositoryImpl(MovieDatabase.getDatabase(application), APINetwork.movies)
 
     private var _keyword = MutableLiveData<String>("")
 
@@ -39,7 +35,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     val searchStatus : LiveData<STATUS> get() = _searchStatus
 
-    fun getMovieFromNetwork(keyword : String) : Job {
+    val fetchSearchData = fun(keyword : String) : Job {
         return viewModelScope.launch() {
             _searchStatus.value = STATUS.ONLOAD
             delay(1000)
