@@ -23,14 +23,11 @@ interface MovieRepository {
 
     suspend fun getMovies(context: Context) : Flow<List<Movie>>?
     suspend fun getMoviesFromNetwork(): List<Movie>
-
-    fun getMovieDetail(id: String): Flow<MovieEntity>
-
+    suspend fun getDetailFromDatabase(id: String): Flow<MovieDetail>?
     suspend fun getDetailFromNetwork(id: String): MovieDetail
-
-    suspend fun refreshMovies()
-
+    suspend fun refreshDetail(id : String)
     fun isDatabaseEmpty() : Flow<Boolean>
+    fun isDetailEmpty(id: String) : Flow<Boolean>
 
 //    suspend fun getMovieFromNetwork(keyword : String) : List<MovieDtoSearch>
 }

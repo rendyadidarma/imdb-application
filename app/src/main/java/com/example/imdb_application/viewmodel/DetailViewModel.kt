@@ -4,30 +4,40 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.imdb_application.data.local.database.MovieDatabase
-import com.example.imdb_application.data.local.database.MovieEntity
-import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.model.MovieDetail
 import com.example.imdb_application.data.remote.api.APINetwork
-import com.example.imdb_application.data.remote.api.APIService
-import com.example.imdb_application.data.repository.MovieRepository
 import com.example.imdb_application.data.repository.MovieRepositoryImpl
 import com.example.imdb_application.data.utils.NetworkChecker
-import kotlinx.coroutines.flow.collect
+import com.example.imdb_application.view.MainActivity
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val movieRepository = MovieRepositoryImpl(MovieDatabase.getDatabase(application), APINetwork.movies)
+    private val movieRepository =
+        MovieRepositoryImpl(MovieDatabase.getDatabase(application), APINetwork.movies)
 
-    private var _movieInDetail = MutableLiveData<MovieDetail>()
+    private var _movieInDetail = MutableStateFlow<MovieDetail?>(null)
 
-    val movieInDetail : LiveData<MovieDetail> get()  = _movieInDetail
+    val movieInDetail: MutableStateFlow<MovieDetail?> get() = _movieInDetail
 
-    fun setMovieInDetail(id: String) {
+    fun setMovieInDetail(id: String, currentActivity: MainActivity?) {
         viewModelScope.launch {
-            val temp = movieRepository.getDetailFromNetwork(id)
-            _movieInDetail.value = temp
+            try {
+                val detail = movieRepository.getDetailFromDatabase(id)?.first()
+                if(detail == null) {
+                    _movieInDetail.value = movieRepository.getDetailFromNetwork(id)
+                } else {
+                    _movieInDetail.value = detail
+                }
+            } catch (exception : IOException) {
+                if(!NetworkChecker.isOnline(getApplication())) {
+                    currentActivity?.onSupportNavigateUp()
+                }
+                Log.w("setMovieInDetail", "Error Detected")
+            }
         }
     }
 

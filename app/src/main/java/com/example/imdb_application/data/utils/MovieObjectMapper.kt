@@ -1,5 +1,6 @@
 package com.example.imdb_application.data.utils
 
+import com.example.imdb_application.data.local.database.DetailEntity
 import com.example.imdb_application.data.local.database.MovieEntity
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.model.MovieDetail
@@ -12,18 +13,36 @@ object MovieObjectMapper {
     fun mapMovieEntityListToMovieList(movieEntities: List<MovieEntity>): List<Movie> {
         return movieEntities.map {
             Movie(
-                fullTitle = it.fullTitle,
+                fullTitle = it.fullTitle!!,
                 id = it.id,
-                image = it.image
+                image = it.image!!
             )
         }
     }
 
+    fun mapDetailEntityToMovieDetail(detailEntity: DetailEntity): MovieDetail {
+        return MovieDetail(
+            contentRating = detailEntity.contentRating,
+            directors = detailEntity.directors,
+            fullTitle = detailEntity.fullTitle,
+            genres = detailEntity.genres,
+            id = detailEntity.id,
+            imDbRating = detailEntity.imDbRating,
+            imDbRatingCount = detailEntity.imDbRatingCount,
+            image = detailEntity.image,
+            plot = detailEntity.plot,
+            releaseState = detailEntity.releaseState,
+            runtimeStr = detailEntity.runtimeStr,
+            stars = detailEntity.stars,
+            title = detailEntity.title
+        )
+    }
+
     fun mapMovieEntityToMovie(movieEntity: MovieEntity): Movie {
         return Movie(
-            fullTitle = movieEntity.fullTitle,
+            fullTitle = movieEntity.fullTitle!!,
             id = movieEntity.id,
-            image = movieEntity.image
+            image = movieEntity.image!!
         )
     }
 
@@ -45,13 +64,31 @@ object MovieObjectMapper {
         )
     }
 
+    fun mapDetailDtoToDetailEntity(detailDto: DetailDto) : DetailEntity {
+        return DetailEntity(
+            contentRating = detailDto.contentRating,
+            directors = detailDto.directors,
+            fullTitle = detailDto.fullTitle,
+            genres = detailDto.genres,
+            id = detailDto.id!!,
+            imDbRating = detailDto.imDbRating,
+            imDbRatingCount = detailDto.imDbRatingVotes,
+            image = detailDto.image,
+            plot = detailDto.plot,
+            releaseState = detailDto.releaseDate,
+            runtimeStr = detailDto.runtimeStr,
+            stars = detailDto.stars,
+            title = detailDto.title
+        )
+    }
+
     fun mapDetailDtoToMovieDetail(detailDto: DetailDto) : MovieDetail {
         return MovieDetail(
             contentRating = detailDto.contentRating,
             directors = detailDto.directors,
             fullTitle = detailDto.fullTitle,
             genres = detailDto.genres,
-            id = detailDto.id,
+            id = detailDto.id!!,
             imDbRating = detailDto.imDbRating,
             imDbRatingCount = detailDto.imDbRatingVotes,
             image = detailDto.image,

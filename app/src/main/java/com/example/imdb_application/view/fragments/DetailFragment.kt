@@ -1,13 +1,12 @@
 package com.example.imdb_application.view.fragments
 
+import android.content.Context
 import android.os.Bundle
-import android.transition.ChangeBounds
 import android.transition.TransitionInflater
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
@@ -28,18 +27,22 @@ class DetailFragment : Fragment() {
         ViewModelProvider(this, DetailViewModel.Factory(activity.application)).get(DetailViewModel::class.java)
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
 
-        viewModel.setMovieInDetail(args.movieId)
         getCurrentActivity()?.setSupportActionBar(binding.toolbar)
-
 
         binding.toolbar.setNavigationOnClickListener {
             getCurrentActivity()?.onSupportNavigateUp()
         }
 
+        viewModel.setMovieInDetail(args.movieId, getCurrentActivity())
     }
 
     private lateinit var binding : FragmentDetailBinding
@@ -53,14 +56,6 @@ class DetailFragment : Fragment() {
         binding = FragmentDetailBinding.inflate(inflater)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
-
-
-
-//        if(getCurrentActivity()?.supportActionBar != null) {
-//            getCurrentActivity()?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-//            getCurrentActivity()?.supportActionBar?.setDisplayShowHomeEnabled(true)
-//        }
-
         return binding.root
     }
 

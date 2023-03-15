@@ -8,8 +8,7 @@ import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.remote.api.APINetwork
 import com.example.imdb_application.data.repository.MovieRepositoryImpl
 import com.example.imdb_application.data.utils.NetworkChecker
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -31,6 +30,29 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         refreshDataFromRepo()
+    }
+
+    fun insertDetailToRoom(id: String) {
+        viewModelScope.launch {
+            try {
+                movieRepository.refreshDetail(id)
+            } catch (err: IOException) {
+                Log.w("detailRefreshData", "Error Detected")
+            }
+        }
+    }
+
+    private var _detailEmptyStatus = MutableStateFlow<Boolean>(false)
+
+    val detailEmptyStatus : StateFlow<Boolean> get() = _detailEmptyStatus
+
+    fun checkDetailIsNullOrNot(id: String) {
+        viewModelScope.launch {
+           movieRepository.isDetailEmpty(id).collect {
+               _detailEmptyStatus.value = it
+               Log.d("checkDetailItemClick", it.toString())
+           }
+        }
     }
 
     private fun _refreshDataFromRepo() {

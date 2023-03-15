@@ -7,7 +7,7 @@ data class MovieDetail(
     val directors: String?,
     val fullTitle: String?,
     val genres: String?,
-    val id: String?,
+    val id: String,
     val imDbRating: String?,
     val imDbRatingCount: String?,
     val image: String?,

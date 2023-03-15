@@ -18,5 +18,4 @@ object Router {
             SearchFragmentDirections.actionSearchFragmentToDetailFragment().setMovieId(movie.id)
         navController.navigate(action)
     }
-
 }

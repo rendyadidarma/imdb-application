@@ -18,6 +18,7 @@ import com.example.imdb_application.view.MainActivity
 import com.example.imdb_application.view.adapter.MovieListAdapter
 import com.example.imdb_application.view.adapter.MovieListener
 import com.example.imdb_application.viewmodel.HomeViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
@@ -65,12 +66,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         binding!!.homeRecyclerView.adapter = MovieListAdapter(
             MovieListener { movie ->
-                if(NetworkChecker.isOnline(requireContext())) {
-                    Router.routeHomeFragmentToDetailFragment(movie, findNavController())
-                    getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
-                } else {
-                    Log.d("Internet Loss", "Can't go to detail, because No Internet Connection Detected")
-                }
+
+                viewModel.insertDetailToRoom(movie.id)
+                Router.routeHomeFragmentToDetailFragment(movie, findNavController())
+                getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
+
             }
         )
 
