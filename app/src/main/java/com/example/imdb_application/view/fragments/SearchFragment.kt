@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -18,24 +19,17 @@ import com.example.imdb_application.databinding.FragmentSearchBinding
 import com.example.imdb_application.view.adapter.MovieListAdapter
 import com.example.imdb_application.view.adapter.MovieListener
 import com.example.imdb_application.viewmodel.SearchViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
-
+@AndroidEntryPoint
 class SearchFragment : Fragment(com.example.imdb_application.R.layout.fragment_search) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
-    private val viewModel: SearchViewModel by lazy {
-        val activity = requireNotNull(this.activity) {
-            "You can access the vmodel after onActivityCreated()"
-        }
-        ViewModelProvider(
-            this,
-            SearchViewModel.Factory(activity.application)
-        ).get(SearchViewModel::class.java)
-    }
+    val viewModel by viewModels<SearchViewModel>()
 
     private lateinit var binding : FragmentSearchBinding
     override fun onCreateView(

@@ -6,23 +6,28 @@ import androidx.lifecycle.*
 import com.example.imdb_application.data.local.database.MovieDatabase
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.remote.api.APINetwork
+import com.example.imdb_application.data.repository.MovieRepository
 import com.example.imdb_application.data.repository.MovieRepositoryImpl
 import com.example.imdb_application.data.utils.NetworkChecker
+import dagger.hilt.android.internal.Contexts.getApplication
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.IOException
+import javax.inject.Inject
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val movieRepository : MovieRepository
+) : ViewModel() {
 
-    private val movieRepository = MovieRepositoryImpl(MovieDatabase.getDatabase(application), APINetwork.movies)
+    private var _movieList = MutableStateFlow<List<Movie>>(listOf())
 
-    private var _movieList = MutableLiveData<List<Movie>>()
+    val movieList : StateFlow<List<Movie>> get() = _movieList
 
-    val movieList : LiveData<List<Movie>> get() = _movieList
+    private var _alreadyHasData = MutableStateFlow<Boolean>(false)
 
-    private var _alreadyHasData = MutableLiveData<Boolean>(false)
-
-    val alreadyHasData : LiveData<Boolean> get() = _alreadyHasData
+    val alreadyHasData : StateFlow<Boolean> get() = _alreadyHasData
 
     private var _dbEmpty = MutableLiveData<Boolean>()
 
@@ -59,7 +64,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _alreadyHasData.value = false
                 try {
-                    val list = movieRepository.getMovies(getApplication())
+                    val list = movieRepository.getMovies()
                     if(list != null) {
                         _movieList.value = list.first()
                         _dbEmpty.value = false
@@ -75,13 +80,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun refreshDataFromRepo() = _refreshDataFromRepo()
 
-    class Factory(val app: Application) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return HomeViewModel(app) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewmodel")
-        }
-    }
+//    class Factory(val app: Application) : ViewModelProvider.Factory {
+//        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//            if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
+//                @Suppress("UNCHECKED_CAST")
+//                return HomeViewModel(app) as T
+//            }
+//            throw IllegalArgumentException("Unable to construct viewmodel")
+//        }
+//    }
 }

@@ -18,16 +18,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 interface MovieRepository {
-//
-//    fun getMovieFromDatabase(): Flow<List<Movie>>
-
-    suspend fun getMovies(context: Context) : Flow<List<Movie>>?
+    suspend fun getMovies() : Flow<List<Movie>>?
     suspend fun getMoviesFromNetwork(): List<Movie>
     suspend fun getDetailFromDatabase(id: String): Flow<MovieDetail>?
     suspend fun getDetailFromNetwork(id: String): MovieDetail
     suspend fun refreshDetail(id : String)
     fun isDatabaseEmpty() : Flow<Boolean>
     fun isDetailEmpty(id: String) : Flow<Boolean>
-
-//    suspend fun getMovieFromNetwork(keyword : String) : List<MovieDtoSearch>
+    suspend fun searchMovies(keyword : String): List<Movie>
 }

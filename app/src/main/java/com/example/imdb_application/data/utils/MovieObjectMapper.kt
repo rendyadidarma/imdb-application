@@ -88,7 +88,7 @@ object MovieObjectMapper {
             directors = detailDto.directors,
             fullTitle = detailDto.fullTitle,
             genres = detailDto.genres,
-            id = detailDto.id!!,
+            id = detailDto.id,
             imDbRating = detailDto.imDbRating,
             imDbRatingCount = detailDto.imDbRatingVotes,
             image = detailDto.image,

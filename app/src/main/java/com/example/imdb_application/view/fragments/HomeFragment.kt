@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -19,19 +21,23 @@ import com.example.imdb_application.view.adapter.MovieListAdapter
 import com.example.imdb_application.view.adapter.MovieListener
 import com.example.imdb_application.viewmodel.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
 
+@AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
-    private val viewModel: HomeViewModel by lazy {
-        val activity = requireNotNull(this.activity) {
-            "You can access the vmodel after onActivityCreated()"
-        }
-        ViewModelProvider(
-            this,
-            HomeViewModel.Factory(activity.application)
-        ).get(HomeViewModel::class.java)
-    }
+//    private val viewModel: HomeViewModel by lazy {
+//        val activity = requireNotNull(this.activity) {
+//            "You can access the vmodel after onActivityCreated()"
+//        }
+//        ViewModelProvider(
+//            this,
+//            HomeViewModel.Factory(activity.application)
+//        ).get(HomeViewModel::class.java)
+//    }
+
+    val viewModel by viewModels<HomeViewModel>()
 
 //    private var viewModelAdapter: MovieListAdapter? = null
 

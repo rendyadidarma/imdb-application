@@ -20,6 +20,7 @@ import com.example.imdb_application.viewmodel.SearchViewModel
 import com.facebook.shimmer.ShimmerFrameLayout
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -43,7 +44,7 @@ fun bindRecyclerView(
 }
 
 @BindingAdapter(value = ["shimmerStatus", "onLoadSearch", "recyclerViews", "imageViews", "dbEmpty"], requireAll = false)
-fun bindShimmer(shimmerFrameLayout: ShimmerFrameLayout, hasData: Boolean?, onLoadSearch: LiveData<STATUS>?, recyclerViews: RecyclerView?, imageViews : ImageView?, dbEmpty : Boolean?) {
+fun bindShimmer(shimmerFrameLayout: ShimmerFrameLayout, hasData: Boolean?, onLoadSearch: StateFlow<STATUS>?, recyclerViews: RecyclerView?, imageViews : ImageView?, dbEmpty : Boolean?) {
     if(hasData != null) {
         when (hasData) {
             true -> {
@@ -89,8 +90,12 @@ fun bindShimmer(shimmerFrameLayout: ShimmerFrameLayout, hasData: Boolean?, onLoa
 
 }
 
+// TODO : Change This Binding Adapter Function to More General
 @BindingAdapter("textChangeListener")
-fun textChangeListener(view: EditText, getNetwork: (keyword : String) -> Job) {
+fun textChangeListener(
+    view: EditText,
+    callback: (keyword : String) -> Job
+) {
 
     var job: Job? = null
 
@@ -105,7 +110,7 @@ fun textChangeListener(view: EditText, getNetwork: (keyword : String) -> Job) {
         override fun afterTextChanged(p0: Editable?) {
             if (!p0.isNullOrEmpty()) {
                 val input = p0.toString()
-                job = getNetwork(input)
+                job = callback(input)
             }
         }
 
