@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.imdb_application.data.model.Movie
+import com.example.imdb_application.data.utils.BindUtils
 import com.example.imdb_application.databinding.ListViewItemBinding
 
 class MovieListAdapter(private val clickListener: MovieListener) : ListAdapter<Movie, MovieListAdapter.MovieViewHolder>(DiffCallback){
@@ -17,14 +18,13 @@ class MovieListAdapter(private val clickListener: MovieListener) : ListAdapter<M
         override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {
             return oldItem.image == newItem.image && oldItem.fullTitle == newItem.fullTitle && oldItem.id == newItem.id
         }
-
     }
 
     class MovieViewHolder(private var binding: ListViewItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind (movieListener: MovieListener,Movie: Movie) {
-            binding.movie = Movie
-            binding.clickListener = movieListener
-            binding.executePendingBindings()
+            binding.movieTitle.text = Movie.fullTitle
+            BindUtils.bindImage(binding.movieImage, Movie.image)
+            binding.itemCard.setOnClickListener {movieListener.onClick(Movie) }
         }
     }
 
@@ -32,7 +32,8 @@ class MovieListAdapter(private val clickListener: MovieListener) : ListAdapter<M
         parent: ViewGroup,
         viewType: Int
     ): MovieViewHolder {
-        return MovieViewHolder(ListViewItemBinding.inflate(LayoutInflater.from(parent.context)))
+        val binding = ListViewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return MovieViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {

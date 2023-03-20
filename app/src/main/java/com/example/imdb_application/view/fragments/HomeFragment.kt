@@ -7,9 +7,13 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.imdb_application.R
+import com.example.imdb_application.data.utils.BindUtils
 import com.example.imdb_application.data.utils.Router
 import com.example.imdb_application.databinding.FragmentHomeBinding
 import com.example.imdb_application.view.MainActivity
@@ -18,24 +22,42 @@ import com.example.imdb_application.view.adapter.MovieListener
 import com.example.imdb_application.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
-
-//    private val viewModel: HomeViewModel by lazy {
-//        val activity = requireNotNull(this.activity) {
-//            "You can access the viewModel after onActivityCreated()"
-//        }
-//        ViewModelProvider(
-//            this,
-//            HomeViewModel.Factory(activity.application)
-//        ).get(HomeViewModel::class.java)
-//    }
 
     val viewModel by viewModels<HomeViewModel>()
 
 
     private var binding: FragmentHomeBinding? = null
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        bindObservables()
+    }
+
+    private fun bindObservables() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.movieList.collect {
+                        BindUtils.bindRecyclerView(binding!!.homeRecyclerView, it)
+                    }
+                }
+
+                launch {
+                    viewModel.alreadyHasData.collect{
+                        BindUtils.bindShimmer(binding!!.shimmerFrameLayout, it, null, null, binding!!.emptyState, viewModel.dbEmpty.first())
+                    }
+                }
+
+            }
+        }
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,8 +66,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // Inflate the layout for this fragment
         getCurrentActivity()?.getBottomNavView()?.visibility = View.VISIBLE
         binding = FragmentHomeBinding.inflate(inflater)
-        binding!!.lifecycleOwner = viewLifecycleOwner
-        binding!!.viewModel = viewModel
 
 
         val verticalDecorator = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)

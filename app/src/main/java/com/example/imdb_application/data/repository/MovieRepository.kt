@@ -9,7 +9,6 @@ interface MovieRepository {
     suspend fun getMovies() : Flow<List<Movie>>?
     suspend fun getMoviesFromNetwork(): List<Movie>
     suspend fun getDetail(id: String): Flow<NetworkResponseWrapper<MovieDetail>>
-    suspend fun getDetailFromNetwork(id: String): MovieDetail
     suspend fun refreshDetail(id : String)
     fun isDatabaseEmpty() : Flow<Boolean>
     suspend fun searchMovies(keyword : String): List<Movie>

@@ -1,8 +1,6 @@
 package com.example.imdb_application.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.imdb_application.data.model.Movie
@@ -28,9 +26,9 @@ class HomeViewModel @Inject constructor(
 
     val alreadyHasData: StateFlow<Boolean> get() = _alreadyHasData
 
-    private var _dbEmpty = MutableLiveData<Boolean>()
+    private var _dbEmpty = MutableStateFlow<Boolean>(true)
 
-    val dbEmpty: LiveData<Boolean> get() = _dbEmpty
+    val dbEmpty: StateFlow<Boolean> get() = _dbEmpty
 
     init {
         refreshDataFromRepo()
@@ -66,13 +64,4 @@ class HomeViewModel @Inject constructor(
 
     fun refreshDataFromRepo() = refreshDataFromRepoLocal()
 
-//    class Factory(val app: Application) : ViewModelProvider.Factory {
-//        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//            if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-//                @Suppress("UNCHECKED_CAST")
-//                return HomeViewModel(app) as T
-//            }
-//            throw IllegalArgumentException("Unable to construct viewModel")
-//        }
-//    }
 }

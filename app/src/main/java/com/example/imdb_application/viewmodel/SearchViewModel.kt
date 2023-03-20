@@ -34,7 +34,6 @@ class SearchViewModel @Inject constructor(
     fun fetchSearchData(keyword : String) {
         viewModelScope.launch {
             _searchStatus.value = STATUS.ON_LOAD
-
             try {
                 val searchResult = movieRepository.searchMovies(keyword)
                 _searchData.value = searchResult

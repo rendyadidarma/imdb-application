@@ -69,10 +69,6 @@ class MovieRepositoryImpl @Inject constructor(
         return MovieObjectMapper.mapNetworkResponseWrapperDetailAsFlow(NetworkResponseWrapper(isInternetAvailable = StateOnline.networkAvailable, movieDetailFromDb))
     }
 
-    override suspend fun getDetailFromNetwork(id: String): MovieDetail {
-        return MovieObjectMapper.mapDetailDtoToMovieDetail(network.getDetail(id))
-    }
-
     override suspend fun refreshDetail(id : String) {
         withContext(Dispatchers.IO) {
             val detail = network.getDetail(id)

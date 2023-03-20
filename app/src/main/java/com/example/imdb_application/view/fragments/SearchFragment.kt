@@ -70,8 +70,6 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     ): View {
 
         binding = FragmentSearchBinding.inflate(inflater)
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
 
         val verticalDecorator = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         val horizontalDecorator = DividerItemDecoration(activity, DividerItemDecoration.HORIZONTAL)
