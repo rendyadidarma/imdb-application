@@ -1,4 +1,4 @@
-package com.example.imdb_application.di
+package com.example.imdb_application.di.modules
 
 import com.example.imdb_application.data.repository.MovieRepository
 import com.example.imdb_application.data.repository.MovieRepositoryImpl

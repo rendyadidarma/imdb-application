@@ -1,32 +1,28 @@
 package com.example.imdb_application.view.fragments
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.imdb_application.R
 import com.example.imdb_application.data.utils.Router
+import com.example.imdb_application.data.utils.onKeywordValueChange
 import com.example.imdb_application.databinding.FragmentSearchBinding
 import com.example.imdb_application.view.adapter.MovieListAdapter
 import com.example.imdb_application.view.adapter.MovieListener
 import com.example.imdb_application.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 
 @AndroidEntryPoint
-class SearchFragment : Fragment(com.example.imdb_application.R.layout.fragment_search) {
+class SearchFragment : Fragment(R.layout.fragment_search) {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    companion object {
+        private const val SEARCH_DEBOUNCE_TIME : Long = 1500
     }
 
     val viewModel by viewModels<SearchViewModel>()
@@ -35,7 +31,7 @@ class SearchFragment : Fragment(com.example.imdb_application.R.layout.fragment_s
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         binding = FragmentSearchBinding.inflate(inflater)
         binding.lifecycleOwner = viewLifecycleOwner
@@ -49,10 +45,13 @@ class SearchFragment : Fragment(com.example.imdb_application.R.layout.fragment_s
         if (drawable != null) {
             verticalDecorator.setDrawable(drawable)
             horizontalDecorator.setDrawable(drawable)
-            binding!!.searchRecyclerView.addItemDecoration(verticalDecorator)
-            binding!!.searchRecyclerView.addItemDecoration(horizontalDecorator)
+            binding.searchRecyclerView.addItemDecoration(verticalDecorator)
+            binding.searchRecyclerView.addItemDecoration(horizontalDecorator)
         }
 
+        onKeywordValueChange(binding.searchView, SEARCH_DEBOUNCE_TIME) { keyword ->
+            viewModel.fetchSearchData(keyword)
+        }
 
         binding.searchRecyclerView.adapter = MovieListAdapter(
             MovieListener {
@@ -65,3 +64,4 @@ class SearchFragment : Fragment(com.example.imdb_application.R.layout.fragment_s
 
 
 }
+

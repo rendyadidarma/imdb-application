@@ -7,6 +7,9 @@ import com.example.imdb_application.data.model.MovieDetail
 import com.example.imdb_application.data.remote.dto.MovieDto
 import com.example.imdb_application.data.remote.dto.MovieDtoSearch
 import com.example.imdb_application.data.remote.dto.detail.DetailDto
+import com.example.imdb_application.data.state.NetworkResponseWrapper
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 object MovieObjectMapper {
     // from Database Model to Domain Model
@@ -38,33 +41,7 @@ object MovieObjectMapper {
         )
     }
 
-    fun mapMovieEntityToMovie(movieEntity: MovieEntity): Movie {
-        return Movie(
-            fullTitle = movieEntity.fullTitle!!,
-            id = movieEntity.id,
-            image = movieEntity.image!!
-        )
-    }
-
-    fun mapMovieEntityToMovieDetail(movieEntity: MovieEntity) : MovieDetail {
-        return MovieDetail(
-            contentRating = movieEntity.contentRating,
-            directors = movieEntity.directors,
-            fullTitle = movieEntity.fullTitle,
-            genres = movieEntity.genres,
-            id = movieEntity.id,
-            imDbRating = movieEntity.imDbRating,
-            imDbRatingCount = movieEntity.imDbRatingCount,
-            image = movieEntity.image,
-            plot = movieEntity.plot,
-            releaseState = movieEntity.releaseState,
-            runtimeStr = movieEntity.runtimeStr,
-            stars = movieEntity.stars,
-            title = movieEntity.title
-        )
-    }
-
-    fun mapDetailDtoToDetailEntity(detailDto: DetailDto) : DetailEntity {
+    fun mapDetailDtoToDetailEntity(detailDto: DetailDto): DetailEntity {
         return DetailEntity(
             contentRating = detailDto.contentRating,
             directors = detailDto.directors,
@@ -82,7 +59,7 @@ object MovieObjectMapper {
         )
     }
 
-    fun mapDetailDtoToMovieDetail(detailDto: DetailDto) : MovieDetail {
+    fun mapDetailDtoToMovieDetail(detailDto: DetailDto): MovieDetail {
         return MovieDetail(
             contentRating = detailDto.contentRating,
             directors = detailDto.directors,
@@ -99,26 +76,8 @@ object MovieObjectMapper {
             title = detailDto.title
         )
     }
-    fun mapMovieDtoToMovieDetail(movieDto: MovieDto) : MovieDetail {
-        return MovieDetail(
-            contentRating = movieDto.contentRating,
-            directors = movieDto.directors,
-            fullTitle = movieDto.fullTitle,
-            genres = movieDto.genres,
-            id = movieDto.id,
-            imDbRating = movieDto.imDbRating,
-            imDbRatingCount = movieDto.imDbRatingCount,
-            image = movieDto.image,
-            plot = movieDto.plot,
-            releaseState = movieDto.releaseState,
-            runtimeStr = movieDto.runtimeStr,
-            stars = movieDto.stars,
-            title = movieDto.title
-        )
-    }
 
-
-    fun mapMovieDtoToMovieEntity(movieDtoList : List<MovieDto>) : List<MovieEntity> {
+    fun mapMovieDtoToMovieEntity(movieDtoList: List<MovieDto>): List<MovieEntity> {
         return movieDtoList.map {
             MovieEntity(
                 contentRating = it.contentRating,
@@ -139,19 +98,41 @@ object MovieObjectMapper {
         }
     }
 
-    fun mapMovieDtoSearchToMovie(movieDtoSearch: List<MovieDtoSearch>) : List<Movie> {
+    fun mapMovieDtoSearchToMovie(movieDtoSearch: List<MovieDtoSearch>): List<Movie> {
         return movieDtoSearch.map {
-            Movie (
-            fullTitle = it.title,
-            id = it.id,
-            image = it.image
+            Movie(
+                fullTitle = it.title,
+                id = it.id,
+                image = it.image
             )
         }
     }
 
-    fun mapMovieDtoListToMovieList(movieDtoSearch: List<MovieDto>) : List<Movie> {
+    fun mapMovieDtoListToFlowMovieList(movieDto: List<MovieDto>): Flow<List<Movie>> {
+        return flow {
+            emit(
+                movieDto.map {
+                    Movie(
+                        fullTitle = it.title,
+                        id = it.id,
+                        image = it.image
+                    )
+                }
+            )
+        }
+    }
+
+    fun mapNetworkResponseWrapperDetailAsFlow(networkResponseWrapper: NetworkResponseWrapper<MovieDetail>): Flow<NetworkResponseWrapper<MovieDetail>> {
+        return flow {
+            emit(
+                NetworkResponseWrapper(isInternetAvailable = networkResponseWrapper.isInternetAvailable, value = networkResponseWrapper.value)
+            )
+        }
+    }
+
+    fun mapMovieDtoListToMovieList(movieDtoSearch: List<MovieDto>): List<Movie> {
         return movieDtoSearch.map {
-            Movie (
+            Movie(
                 fullTitle = it.title,
                 id = it.id,
                 image = it.image

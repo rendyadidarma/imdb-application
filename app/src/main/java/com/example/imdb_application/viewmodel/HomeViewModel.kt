@@ -1,33 +1,32 @@
 package com.example.imdb_application.viewmodel
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.*
-import com.example.imdb_application.data.local.database.MovieDatabase
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.imdb_application.data.model.Movie
-import com.example.imdb_application.data.remote.api.APINetwork
 import com.example.imdb_application.data.repository.MovieRepository
-import com.example.imdb_application.data.repository.MovieRepositoryImpl
-import com.example.imdb_application.data.utils.NetworkChecker
-import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val movieRepository : MovieRepository
+    private val movieRepository: MovieRepository
 ) : ViewModel() {
 
     private var _movieList = MutableStateFlow<List<Movie>>(listOf())
 
-    val movieList : StateFlow<List<Movie>> get() = _movieList
+    val movieList: StateFlow<List<Movie>> get() = _movieList
 
-    private var _alreadyHasData = MutableStateFlow<Boolean>(false)
+    private var _alreadyHasData = MutableStateFlow(false)
 
-    val alreadyHasData : StateFlow<Boolean> get() = _alreadyHasData
+    val alreadyHasData: StateFlow<Boolean> get() = _alreadyHasData
 
     private var _dbEmpty = MutableLiveData<Boolean>()
 
@@ -47,38 +46,25 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private var _detailEmptyStatus = MutableStateFlow<Boolean>(false)
-
-    val detailEmptyStatus : StateFlow<Boolean> get() = _detailEmptyStatus
-
-    fun checkDetailIsNullOrNot(id: String) {
-        viewModelScope.launch {
-           movieRepository.isDetailEmpty(id).collect {
-               _detailEmptyStatus.value = it
-               Log.d("checkDetailItemClick", it.toString())
-           }
-        }
-    }
-
-    private fun _refreshDataFromRepo() {
+    private fun refreshDataFromRepoLocal() {
         viewModelScope.launch {
             _alreadyHasData.value = false
-                try {
-                    val list = movieRepository.getMovies()
-                    if(list != null) {
-                        _movieList.value = list.first()
-                        _dbEmpty.value = false
-                    } else {
-                        _dbEmpty.value = true
-                    }
-                    _alreadyHasData.value = true
-                } catch (error: IOException) {
-                    Log.w("ErrorInHomeViewModel", "Error Detected in Home View Model Refresh fun")
+            try {
+                val list = movieRepository.getMovies()
+                if (list != null) {
+                    _movieList.value = list.first()
+                    _dbEmpty.value = false
+                } else {
+                    _dbEmpty.value = true
                 }
+                _alreadyHasData.value = true
+            } catch (error: IOException) {
+                Log.w("ErrorInHomeViewModel", "Error Detected in Home View Model Refresh fun")
+            }
         }
     }
 
-    fun refreshDataFromRepo() = _refreshDataFromRepo()
+    fun refreshDataFromRepo() = refreshDataFromRepoLocal()
 
 //    class Factory(val app: Application) : ViewModelProvider.Factory {
 //        override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -86,7 +72,7 @@ class HomeViewModel @Inject constructor(
 //                @Suppress("UNCHECKED_CAST")
 //                return HomeViewModel(app) as T
 //            }
-//            throw IllegalArgumentException("Unable to construct viewmodel")
+//            throw IllegalArgumentException("Unable to construct viewModel")
 //        }
 //    }
 }

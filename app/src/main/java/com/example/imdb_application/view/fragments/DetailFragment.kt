@@ -1,6 +1,5 @@
 package com.example.imdb_application.view.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.transition.TransitionInflater
 import android.util.Log
@@ -9,12 +8,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
+import com.example.imdb_application.data.utils.ImageLoader
 import com.example.imdb_application.databinding.FragmentDetailBinding
 import com.example.imdb_application.view.MainActivity
 import com.example.imdb_application.viewmodel.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DetailFragment : Fragment() {
@@ -34,7 +38,8 @@ class DetailFragment : Fragment() {
             getCurrentActivity()?.onSupportNavigateUp()
         }
 
-        viewModel.setMovieInDetail(args.movieId, getCurrentActivity())
+        viewModel.setMovieInDetail(args.movieId)
+        bindObservables()
     }
 
     private lateinit var binding : FragmentDetailBinding
@@ -42,13 +47,47 @@ class DetailFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Log.d("OnDetail", "Enter On Detail")
 
         binding = FragmentDetailBinding.inflate(inflater)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         return binding.root
+    }
+
+    private fun bindObservables() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+                launch {
+                    viewModel.movieInDetail.collectLatest {
+                        if(it != null) {
+                            binding.nestedScrollView.visibility = View.VISIBLE
+                            binding.foundAProblem.visibility = View.GONE
+                            with(it) {
+                                binding.detailTitleView.title = title
+                                ImageLoader.bindImage(binding.detailImageView, image)
+                                binding.detailPlotView.text = plot
+                                binding.detailReleaseView.text = releaseState
+                                binding.detailRuntimeView.text = runtimeStr
+                                binding.detailContentRatingView.text = contentRating
+                                binding.detailImdbRatingView.text = imDbRating
+                                binding.detailImdbCountView.text = String.format("(%s)", imDbRatingCount)
+                                binding.detailGenresView.text = genres
+                                binding.detailDirectorsView.text = directors
+                                binding.detailStarsView.text = stars
+                            }
+                        } else {
+                            binding.nestedScrollView.visibility = View.GONE
+                            binding.foundAProblem.visibility = View.VISIBLE
+                        }
+
+                    }
+                }
+
+            }
+        }
     }
 
     private fun getCurrentActivity(): MainActivity? {

@@ -1,8 +1,5 @@
 package com.example.imdb_application.data.remote.dto
 
-import com.example.imdb_application.data.local.database.MovieEntity
-import com.example.imdb_application.data.model.Movie
-import com.example.imdb_application.data.remote.api.APINetwork.movies
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 

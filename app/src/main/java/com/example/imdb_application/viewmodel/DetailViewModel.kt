@@ -1,19 +1,14 @@
 package com.example.imdb_application.viewmodel
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.*
-import com.example.imdb_application.data.local.database.MovieDatabase
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.imdb_application.data.model.MovieDetail
-import com.example.imdb_application.data.remote.api.APINetwork
 import com.example.imdb_application.data.repository.MovieRepository
-import com.example.imdb_application.data.repository.MovieRepositoryImpl
-import com.example.imdb_application.data.utils.NetworkChecker
-import com.example.imdb_application.view.MainActivity
-import dagger.hilt.android.internal.Contexts.getApplication
+import com.example.imdb_application.data.sealed.StateOnline
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
@@ -23,27 +18,27 @@ class DetailViewModel @Inject constructor(
     private val movieRepository : MovieRepository
 ) : ViewModel() {
 
-//    private val movieRepository =
-//        MovieRepositoryImpl(MovieDatabase.getDatabase(application), APINetwork.movies)
+    private var _movieInDetail = MutableStateFlow<MovieDetail?>(MovieDetail())
 
-    private var _movieInDetail = MutableStateFlow<MovieDetail?>(null)
+    val movieInDetail: StateFlow<MovieDetail?> get() = _movieInDetail
 
-    val movieInDetail: MutableStateFlow<MovieDetail?> get() = _movieInDetail
+    private var _statusInternet = MutableStateFlow<StateOnline?>(null)
 
-    fun setMovieInDetail(id: String, currentActivity: MainActivity?) {
+    val statusInternet : StateFlow<StateOnline?> get() = _statusInternet
+
+    private var _statusNoData = MutableStateFlow(true)
+
+    val statusNoData: StateFlow<Boolean> get() = _statusNoData
+
+    fun setMovieInDetail(id: String) {
         viewModelScope.launch {
             try {
-                val detail = movieRepository.getDetailFromDatabase(id)?.first()
-                if(detail == null) {
-                    _movieInDetail.value = movieRepository.getDetailFromNetwork(id)
-                } else {
-                    _movieInDetail.value = detail
+                val state = movieRepository.getDetail(id)
+                state.collect {
+                    _movieInDetail.value = it.value
+                    _statusInternet.value = it.isInternetAvailable
                 }
             } catch (exception : IOException) {
-                // TODO : Change for this approach
-//                if(!NetworkChecker.isOnline(getApplication())) {
-//                    currentActivity?.onSupportNavigateUp()
-//                }
                 Log.w("setMovieInDetail", "Error Detected")
             }
         }
@@ -55,7 +50,7 @@ class DetailViewModel @Inject constructor(
 //                @Suppress("UNCHECKED_CAST")
 //                return DetailViewModel(app) as T
 //            }
-//            throw IllegalArgumentException("Unable to construct viewmodel")
+//            throw IllegalArgumentException("Unable to construct viewModel")
 //        }
 //    }
 

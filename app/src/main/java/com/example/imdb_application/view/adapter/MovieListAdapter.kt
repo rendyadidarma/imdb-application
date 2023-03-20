@@ -31,11 +31,11 @@ class MovieListAdapter(private val clickListener: MovieListener) : ListAdapter<M
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): MovieListAdapter.MovieViewHolder {
+    ): MovieViewHolder {
         return MovieViewHolder(ListViewItemBinding.inflate(LayoutInflater.from(parent.context)))
     }
 
-    override fun onBindViewHolder(holder: MovieListAdapter.MovieViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val itemMovie = getItem(position)
         holder.bind(clickListener, itemMovie)
     }

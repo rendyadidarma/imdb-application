@@ -1,26 +1,21 @@
 package com.example.imdb_application.view.fragments
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.imdb_application.R
-import com.example.imdb_application.data.utils.NetworkChecker
 import com.example.imdb_application.data.utils.Router
 import com.example.imdb_application.databinding.FragmentHomeBinding
 import com.example.imdb_application.view.MainActivity
 import com.example.imdb_application.view.adapter.MovieListAdapter
 import com.example.imdb_application.view.adapter.MovieListener
 import com.example.imdb_application.viewmodel.HomeViewModel
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
 
@@ -29,7 +24,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
 //    private val viewModel: HomeViewModel by lazy {
 //        val activity = requireNotNull(this.activity) {
-//            "You can access the vmodel after onActivityCreated()"
+//            "You can access the viewModel after onActivityCreated()"
 //        }
 //        ViewModelProvider(
 //            this,
@@ -39,18 +34,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     val viewModel by viewModels<HomeViewModel>()
 
-//    private var viewModelAdapter: MovieListAdapter? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     private var binding: FragmentHomeBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         getCurrentActivity()?.getBottomNavView()?.visibility = View.VISIBLE
         binding = FragmentHomeBinding.inflate(inflater)

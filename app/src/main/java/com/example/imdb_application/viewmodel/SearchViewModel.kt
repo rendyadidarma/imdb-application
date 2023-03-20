@@ -1,27 +1,17 @@
 package com.example.imdb_application.viewmodel
 
-import android.app.Application
-import android.text.TextWatcher
-import android.util.Log
-import androidx.lifecycle.*
-import com.example.imdb_application.data.local.database.MovieDatabase
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.imdb_application.data.model.Movie
-import com.example.imdb_application.data.remote.api.APINetwork
-import com.example.imdb_application.data.remote.dto.MovieDtoSearch
 import com.example.imdb_application.data.repository.MovieRepository
-import com.example.imdb_application.data.repository.MovieRepositoryImpl
-import com.example.imdb_application.data.utils.MovieObjectMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class STATUS {
-    NODATA, HASDATA, ONLOAD
+    NO_DATA, HAS_DATA, ON_LOAD
 }
 
 @HiltViewModel
@@ -37,36 +27,27 @@ class SearchViewModel @Inject constructor(
 
     val searchData: StateFlow<List<Movie>> get() = _searchData
 
-    private var _searchStatus = MutableStateFlow<STATUS>(STATUS.NODATA)
+    private var _searchStatus = MutableStateFlow(STATUS.NO_DATA)
 
     val searchStatus : StateFlow<STATUS> get() = _searchStatus
 
-    val fetchSearchData = fun(keyword : String) : Job {
-        return viewModelScope.launch() {
-            _searchStatus.value = STATUS.ONLOAD
-            delay(1000)
+    fun fetchSearchData(keyword : String) {
+        viewModelScope.launch {
+            _searchStatus.value = STATUS.ON_LOAD
+
             try {
                 val searchResult = movieRepository.searchMovies(keyword)
                 _searchData.value = searchResult
                 if(_searchData.value.isNotEmpty()) {
-                    _searchStatus.value = STATUS.HASDATA
+                    _searchStatus.value = STATUS.HAS_DATA
                 } else {
-                    _searchStatus.value = STATUS.NODATA
+                    _searchStatus.value = STATUS.NO_DATA
                 }
             } catch (e : java.lang.Exception) {
                 _searchData.value = listOf()
-                _searchStatus.value = STATUS.NODATA
+                _searchStatus.value = STATUS.NO_DATA
             }
         }
     }
-//
-//    class Factory(val app: Application) : ViewModelProvider.Factory {
-//        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//            if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
-//                @Suppress("UNCHECKED_CAST")
-//                return SearchViewModel(app) as T
-//            }
-//            throw IllegalArgumentException("Unable to construct viewmodel")
-//        }
-//    }
+
 }

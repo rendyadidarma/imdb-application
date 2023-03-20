@@ -2,12 +2,6 @@ package com.example.imdb_application.data.local.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.imdb_application.data.model.Movie
-import com.example.imdb_application.data.model.MovieDetail
-import com.example.imdb_application.data.remote.dto.Director
-import com.example.imdb_application.data.remote.dto.Genre
-import com.example.imdb_application.data.remote.dto.Star
-import kotlinx.android.parcel.Parcelize
 
 @Entity("movie_table")
 data class MovieEntity constructor(
@@ -44,6 +38,4 @@ data class DetailEntity constructor(
     val runtimeStr: String?,
     val stars: String?,
     val title: String?
-) {
-
-}
+)
