@@ -16,6 +16,8 @@
 
         <EditText
             android:id="@+id/search_view"
+            android:inputType="text"
+            android:autofillHints="name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
@@ -26,7 +28,6 @@
             android:textColorHint="@color/background"
             android:drawableStart="@drawable/icon_search_24"
             android:background="@color/white"
-            android:text="@{viewModel.keyword}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -40,9 +41,6 @@
             app:layout_constraintTop_toBottomOf="@id/search_view"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:onLoadSearch="@{viewModel.searchStatus}"
-            app:recyclerViews="@{searchRecyclerView}"
-            app:imageViews="@{noDataPlaceHolder}"
             >
 
             <LinearLayout
@@ -66,6 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="40dp"
+            android:contentDescription="@string/no_data_place_holder"
             android:src="@drawable/search_fragment_icon_woman_searching"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -74,7 +73,6 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/searchRecyclerView"
-            listOfData="@{viewModel.searchData}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:clipToPadding="false"

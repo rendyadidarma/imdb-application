@@ -12,7 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
-import com.example.imdb_application.data.utils.ImageLoader
+import com.example.imdb_application.data.utils.BindUtils
 import com.example.imdb_application.databinding.FragmentDetailBinding
 import com.example.imdb_application.view.MainActivity
 import com.example.imdb_application.viewmodel.DetailViewModel
@@ -51,8 +51,6 @@ class DetailFragment : Fragment() {
         Log.d("OnDetail", "Enter On Detail")
 
         binding = FragmentDetailBinding.inflate(inflater)
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
         return binding.root
     }
 
@@ -67,7 +65,7 @@ class DetailFragment : Fragment() {
                             binding.foundAProblem.visibility = View.GONE
                             with(it) {
                                 binding.detailTitleView.title = title
-                                ImageLoader.bindImage(binding.detailImageView, image)
+                                BindUtils.bindImage(binding.detailImageView, image)
                                 binding.detailPlotView.text = plot
                                 binding.detailReleaseView.text = releaseState
                                 binding.detailRuntimeView.text = runtimeStr
@@ -82,7 +80,6 @@ class DetailFragment : Fragment() {
                             binding.nestedScrollView.visibility = View.GONE
                             binding.foundAProblem.visibility = View.VISIBLE
                         }
-
                     }
                 }
 
