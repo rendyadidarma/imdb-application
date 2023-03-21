@@ -16,4 +16,5 @@
     <string name="posterImage">poster %s</string>
     <string name="search_imdb">Search IMDb</string>
     <string name="no_data_place_holder">noDataPlaceholder</string>
+    <string name="movie_item">movie item</string>
 </resources>

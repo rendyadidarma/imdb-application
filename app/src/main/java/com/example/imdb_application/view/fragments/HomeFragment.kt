@@ -29,12 +29,40 @@ import kotlinx.coroutines.launch
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
     val viewModel by viewModels<HomeViewModel>()
+    
+    private var _binding: FragmentHomeBinding? = null
 
-
-    private var binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val verticalDecorator = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
+        val horizontalDecorator = DividerItemDecoration(activity, DividerItemDecoration.HORIZONTAL)
+
+        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.divider_recycler, null)
+
+        if (drawable != null) {
+            verticalDecorator.setDrawable(drawable)
+            horizontalDecorator.setDrawable(drawable)
+            binding.homeRecyclerView.addItemDecoration(verticalDecorator)
+            binding.homeRecyclerView.addItemDecoration(horizontalDecorator)
+        }
+
+        binding.homeRecyclerView.adapter = MovieListAdapter(
+            MovieListener { movie ->
+
+                viewModel.insertDetailToRoom(movie.id)
+                Router.routeHomeFragmentToDetailFragment(movie, findNavController())
+                getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
+
+            }
+        )
+
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.refreshDataFromRepo()
+            swipe_refresh.isRefreshing = false
+        }
 
         bindObservables()
     }
@@ -44,13 +72,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.movieList.collect {
-                        BindUtils.bindRecyclerView(binding!!.homeRecyclerView, it)
+                        BindUtils.bindRecyclerView(binding.homeRecyclerView, it)
                     }
                 }
 
                 launch {
                     viewModel.alreadyHasData.collect{
-                        BindUtils.bindShimmer(binding!!.shimmerFrameLayout, it, null, null, binding!!.emptyState, viewModel.dbEmpty.first())
+                        BindUtils.bindShimmer(binding.shimmerFrameLayout, it, null, null, binding!!.emptyState, viewModel.dbEmpty.first())
                     }
                 }
 
@@ -65,37 +93,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     ): View {
         // Inflate the layout for this fragment
         getCurrentActivity()?.getBottomNavView()?.visibility = View.VISIBLE
-        binding = FragmentHomeBinding.inflate(inflater)
-
-
-        val verticalDecorator = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
-        val horizontalDecorator = DividerItemDecoration(activity, DividerItemDecoration.HORIZONTAL)
-
-        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.divider_recycler, null)
-
-        if (drawable != null) {
-            verticalDecorator.setDrawable(drawable)
-            horizontalDecorator.setDrawable(drawable)
-            binding!!.homeRecyclerView.addItemDecoration(verticalDecorator)
-            binding!!.homeRecyclerView.addItemDecoration(horizontalDecorator)
-        }
-
-        binding!!.homeRecyclerView.adapter = MovieListAdapter(
-            MovieListener { movie ->
-
-                viewModel.insertDetailToRoom(movie.id)
-                Router.routeHomeFragmentToDetailFragment(movie, findNavController())
-                getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
-
-            }
-        )
-
-        binding!!.swipeRefresh.setOnRefreshListener {
-            viewModel.refreshDataFromRepo()
-            swipe_refresh.isRefreshing = false
-        }
-
-        return binding!!.root
+        _binding = FragmentHomeBinding.inflate(inflater)
+        return binding.root
     }
 
     private fun getCurrentActivity(): MainActivity? {
@@ -104,12 +103,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onStart() {
         super.onStart()
-        binding!!.shimmerFrameLayout.startShimmer()
+        binding.shimmerFrameLayout.startShimmer()
     }
 
     override fun onPause() {
         super.onPause()
-        binding!!.shimmerFrameLayout.stopShimmer()
+        binding.shimmerFrameLayout.stopShimmer()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

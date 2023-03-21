@@ -42,7 +42,10 @@ class DetailFragment : Fragment() {
         bindObservables()
     }
 
-    private lateinit var binding : FragmentDetailBinding
+    private var _binding : FragmentDetailBinding? = null
+
+    private val binding get() = _binding!!
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,8 +53,13 @@ class DetailFragment : Fragment() {
     ): View {
         Log.d("OnDetail", "Enter On Detail")
 
-        binding = FragmentDetailBinding.inflate(inflater)
+        _binding = FragmentDetailBinding.inflate(inflater)
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun bindObservables() {

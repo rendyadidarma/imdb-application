@@ -32,10 +32,35 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
     val viewModel by viewModels<SearchViewModel>()
 
-    private lateinit var binding : FragmentSearchBinding
+    private var _binding : FragmentSearchBinding? = null
+
+    private val binding get() = _binding!!
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val verticalDecorator = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
+        val horizontalDecorator = DividerItemDecoration(activity, DividerItemDecoration.HORIZONTAL)
+
+        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.divider_recycler, null)
+
+        if (drawable != null) {
+            verticalDecorator.setDrawable(drawable)
+            horizontalDecorator.setDrawable(drawable)
+            binding.searchRecyclerView.addItemDecoration(verticalDecorator)
+            binding.searchRecyclerView.addItemDecoration(horizontalDecorator)
+        }
+
+        onKeywordValueChange(binding.searchView, SEARCH_DEBOUNCE_TIME) { keyword ->
+            viewModel.fetchSearchData(keyword)
+        }
+
+
+
+        binding.searchRecyclerView.adapter = MovieListAdapter(
+            MovieListener {
+                Router.routeSearchFragmentToDetailFragment(movie = it, findNavController())
+            }
+        )
         bindObservables()
     }
 
@@ -69,33 +94,14 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         savedInstanceState: Bundle?
     ): View {
 
-        binding = FragmentSearchBinding.inflate(inflater)
-
-        val verticalDecorator = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
-        val horizontalDecorator = DividerItemDecoration(activity, DividerItemDecoration.HORIZONTAL)
-
-        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.divider_recycler, null)
-
-        if (drawable != null) {
-            verticalDecorator.setDrawable(drawable)
-            horizontalDecorator.setDrawable(drawable)
-            binding.searchRecyclerView.addItemDecoration(verticalDecorator)
-            binding.searchRecyclerView.addItemDecoration(horizontalDecorator)
-        }
-
-        onKeywordValueChange(binding.searchView, SEARCH_DEBOUNCE_TIME) { keyword ->
-            viewModel.fetchSearchData(keyword)
-        }
-
-
-
-        binding.searchRecyclerView.adapter = MovieListAdapter(
-            MovieListener {
-                Router.routeSearchFragmentToDetailFragment(movie = it, findNavController())
-            }
-        )
+        _binding = FragmentSearchBinding.inflate(inflater)
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

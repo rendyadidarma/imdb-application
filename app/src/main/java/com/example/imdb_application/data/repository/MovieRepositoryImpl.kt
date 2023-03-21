@@ -11,9 +11,7 @@ import com.example.imdb_application.data.utils.MovieObjectMapper
 import com.example.imdb_application.data.utils.NetworkChecker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -55,19 +53,23 @@ class MovieRepositoryImpl @Inject constructor(
         val isDetailNotFound = databaseDao.isDetailEmpty(id).first()
 
         var movieDetailFromDb = MovieDetail()
-
+        // TODO : use when
         if (NetworkChecker.isOnline(applicationContext) && isDetailNotFound) {
             val movieDetailFromNetwork = MovieObjectMapper.mapDetailDtoToMovieDetail(network.getDetail(id))
             return MovieObjectMapper.mapNetworkResponseWrapperDetailAsFlow(NetworkResponseWrapper(StateOnline.networkAvailable, movieDetailFromNetwork))
         } else if(NetworkChecker.isOnline(applicationContext).not() && isDetailNotFound) {
             return MovieObjectMapper.mapNetworkResponseWrapperDetailAsFlow(NetworkResponseWrapper(StateOnline.networkUnavailable, null))
+        } else {
+            return databaseDao.getDetail(id).flatMapLatest {
+                flow {
+                    val movieDetail = MovieObjectMapper.mapDetailEntityToMovieDetail(it)
+                    val responseWrapper = NetworkResponseWrapper(StateOnline.networkAvailable, movieDetail)
+                    emit(responseWrapper)
+                }
+            }
         }
-
-        if(isDetailNotFound.not()) {
-            movieDetailFromDb =  databaseDao.getDetail(id).map { MovieObjectMapper.mapDetailEntityToMovieDetail(it) }.first()
-        }
-        return MovieObjectMapper.mapNetworkResponseWrapperDetailAsFlow(NetworkResponseWrapper(isInternetAvailable = StateOnline.networkAvailable, movieDetailFromDb))
     }
+    // TODO : difference between flatMapLatest and flatMapMerge
 
     override suspend fun refreshDetail(id : String) {
         withContext(Dispatchers.IO) {
