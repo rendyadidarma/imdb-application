@@ -18,7 +18,9 @@ import com.example.imdb_application.databinding.FragmentDetailBinding
 import com.example.imdb_application.view.MainActivity
 import com.example.imdb_application.viewmodel.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -37,8 +39,8 @@ class DetailFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener {
             getCurrentActivity()?.onSupportNavigateUp()
         }
-
-        viewModel.setMovieInDetail(args.movieId)
+//
+//        viewModel.setMovieInDetail(args.movieId)
         bindObservables()
     }
 
@@ -62,12 +64,17 @@ class DetailFragment : Fragment() {
         _binding = null
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun bindObservables() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 launch {
-                    viewModel.movieInDetail.collectLatest {
+                    val isDetailEmpty = viewModel.isDetailEmpty
+
+                    isDetailEmpty.flatMapLatest {
+                        viewModel.movieInDetail(it)
+                    }.collectLatest {
                         if(it != null) {
                             binding.nestedScrollView.visibility = View.VISIBLE
                             binding.foundAProblem.visibility = View.GONE
@@ -77,6 +84,7 @@ class DetailFragment : Fragment() {
                             binding.foundAProblem.visibility = View.VISIBLE
                         }
                     }
+
                 }
 
             }

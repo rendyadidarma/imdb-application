@@ -11,28 +11,32 @@ import com.example.imdb_application.data.utils.MovieObjectMapper
 import com.example.imdb_application.data.utils.NetworkChecker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class MovieRepositoryImpl @Inject constructor(
     private val databaseDao: MovieDao,
     private val network: APIService,
-    @ApplicationContext private val applicationContext: Context) : MovieRepository {
+    @ApplicationContext private val applicationContext: Context
+) : MovieRepository {
 
     //Inet -> Ambil Data -> Update DB -> Tampilin Data
     //No Inet -> Check DB [DB Kosong -> Tampilin Empty State] [DB Berisi -> Tampilin Data]
     override suspend fun getMovies(): Flow<List<Movie>>? {
         // 1
-        if(NetworkChecker.isOnline(applicationContext)) {
-            val  moviesList = network.getMovieInTheaters()
+        if (NetworkChecker.isOnline(applicationContext)) {
+            val moviesList = network.getMovieInTheaters()
             withContext(Dispatchers.IO) {
                 databaseDao.insertAll(MovieObjectMapper.mapMovieDtoToMovieEntity(moviesList.movies))
             }
             return MovieObjectMapper.mapMovieDtoListToFlowMovieList(moviesList.movies)
         } else if (!NetworkChecker.isOnline(applicationContext)) { // 2
             val emptyDb = isDatabaseEmpty().first()
-            if(emptyDb) {
+            if (emptyDb) {
                 return null
             }
         }
@@ -40,45 +44,62 @@ class MovieRepositoryImpl @Inject constructor(
         return databaseDao.getMovies().map { MovieObjectMapper.mapMovieEntityListToMovieList(it) }
     }
 
-    override suspend fun searchMovies(keyword : String): List<Movie> {
+    override suspend fun searchMovies(keyword: String): List<Movie> {
         return MovieObjectMapper.mapMovieDtoSearchToMovie(network.searchMovie(keyword).moviesForSearch)
     }
 
-    override fun isDatabaseEmpty() : Flow<Boolean> {
+    override fun isDatabaseEmpty(): Flow<Boolean> {
         return databaseDao.isMovieEmpty()
     }
 
-    // From Database
-    override suspend fun getDetail(id : String) : Flow<NetworkResponseWrapper<MovieDetail>> {
-        val isDetailNotFound = databaseDao.isDetailEmpty(id).first()
+    override fun isDetailEmpty(id: String): Flow<Boolean> {
+        return databaseDao.isDetailEmpty(id)
+    }
 
-        var movieDetailFromDb = MovieDetail()
-        // TODO : use when
-        if (NetworkChecker.isOnline(applicationContext) && isDetailNotFound) {
-            val movieDetailFromNetwork = MovieObjectMapper.mapDetailDtoToMovieDetail(network.getDetail(id))
-            return MovieObjectMapper.mapNetworkResponseWrapperDetailAsFlow(NetworkResponseWrapper(StateOnline.networkAvailable, movieDetailFromNetwork))
-        } else if(NetworkChecker.isOnline(applicationContext).not() && isDetailNotFound) {
-            return MovieObjectMapper.mapNetworkResponseWrapperDetailAsFlow(NetworkResponseWrapper(StateOnline.networkUnavailable, null))
-        } else {
-            return databaseDao.getDetail(id).flatMapLatest {
-                flow {
+    // From Database
+    override suspend fun getDetail(isDetailEmpty : Boolean, id: String): Flow<NetworkResponseWrapper<MovieDetail>> {
+
+        val networkIsAvailableAndDataNotFound =
+            NetworkChecker.isOnline(applicationContext) && isDetailEmpty
+        val networkIsUnavailableAndDataNotFound =
+            !NetworkChecker.isOnline(applicationContext) && isDetailEmpty
+
+        when {
+            networkIsAvailableAndDataNotFound -> {
+                val movieDetailFromNetwork =
+                    MovieObjectMapper.mapDetailDtoToMovieDetail(network.getDetail(id))
+                return MovieObjectMapper.mapNetworkResponseWrapperDetailAsFlow(
+                    NetworkResponseWrapper(StateOnline.networkAvailable, movieDetailFromNetwork)
+                )
+            }
+
+            networkIsUnavailableAndDataNotFound -> {
+                return MovieObjectMapper.mapNetworkResponseWrapperDetailAsFlow(
+                    NetworkResponseWrapper(StateOnline.networkUnavailable, null)
+                )
+            }
+
+            else -> {
+                return databaseDao.getDetail(id).mapLatest {
                     val movieDetail = MovieObjectMapper.mapDetailEntityToMovieDetail(it)
-                    val responseWrapper = NetworkResponseWrapper(StateOnline.networkAvailable, movieDetail)
-                    emit(responseWrapper)
+                    val responseWrapper =
+                        NetworkResponseWrapper(StateOnline.networkAvailable, movieDetail)
+                    responseWrapper
                 }
             }
+
         }
     }
     // TODO : difference between flatMapLatest and flatMapMerge
 
-    override suspend fun refreshDetail(id : String) {
+    override suspend fun refreshDetail(id: String) {
         withContext(Dispatchers.IO) {
             val detail = network.getDetail(id)
             databaseDao.insertDetail(MovieObjectMapper.mapDetailDtoToDetailEntity(detail))
         }
     }
 
-    override suspend fun getMoviesFromNetwork() : List<Movie> {
+    override suspend fun getMoviesFromNetwork(): List<Movie> {
         return MovieObjectMapper.mapMovieDtoListToMovieList(network.getMovieInTheaters().movies)
     }
 

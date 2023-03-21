@@ -1,37 +1,40 @@
 package com.example.imdb_application.viewmodel
 
-import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.imdb_application.data.model.MovieDetail
 import com.example.imdb_application.data.repository.MovieRepository
+import com.example.imdb_application.view.fragments.DetailFragmentArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import java.io.IOException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val movieRepository : MovieRepository
 ) : ViewModel() {
 
-    private var _movieInDetail = MutableStateFlow<MovieDetail?>(MovieDetail())
+    private val args = DetailFragmentArgs.fromSavedStateHandle(savedStateHandle)
 
-    val movieInDetail: StateFlow<MovieDetail?> get() = _movieInDetail
+    val isDetailEmpty = movieRepository.isDetailEmpty(args.movieId).map { it }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(), true
+    )
 
-    fun setMovieInDetail(id: String) {
-        viewModelScope.launch {
-            try {
-                val state = movieRepository.getDetail(id)
-                state.collect {
-                    _movieInDetail.value = it.value
-                }
-            } catch (exception : IOException) {
-                Log.w("setMovieInDetail", "Error Detected")
-            }
-        }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun movieInDetail(detailEmpty: Boolean): Flow<MovieDetail?> {
+        return movieRepository.getDetail(detailEmpty, args.movieId).mapLatest {
+            it.value
+        }.conflate()
     }
+
+//    val movieInDetail = movieRepository.getDetail(args.movieId).map { it.value }.
+//        stateIn(
+//            viewModelScope,
+//            SharingStarted.WhileSubscribed(),
+//            null
+//        )
 
 }
