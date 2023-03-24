@@ -26,12 +26,11 @@ class MovieRepositoryImpl @Inject constructor(
     //Inet -> Ambil Data -> Update DB -> Tampilin Data
     //No Inet -> Check DB [DB Kosong -> Tampilin Empty State] [DB Berisi -> Tampilin Data]
     override suspend fun getMovies(isDatabaseEmpty: Boolean): Flow<NetworkResponseWrapper<List<Movie>>> {
-        // 1
-//        val networkAvailable = NetworkChecker.isOnline(applicationContext)
         val networkUnavailableAndDataNotEmpty =
             NetworkChecker.isOnline(applicationContext).not() && isDatabaseEmpty.not()
         val networkUnavailableAndDataEmpty =
             NetworkChecker.isOnline(applicationContext).not() && isDatabaseEmpty
+
 
         when {
             networkUnavailableAndDataNotEmpty -> {

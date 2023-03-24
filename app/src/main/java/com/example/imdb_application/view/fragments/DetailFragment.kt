@@ -1,7 +1,6 @@
 package com.example.imdb_application.view.fragments
 
 import android.os.Bundle
-import android.transition.TransitionInflater
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.navArgs
+import com.example.imdb_application.R
 import com.example.imdb_application.data.model.MovieDetail
 import com.example.imdb_application.data.utils.BindUtils
 import com.example.imdb_application.databinding.FragmentDetailBinding
@@ -24,16 +23,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DetailFragment : Fragment() {
-
-    private val args: DetailFragmentArgs by navArgs()
+class DetailFragment : Fragment(R.layout.fragment_detail) {
 
     val viewModel by viewModels<DetailViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        sharedElementEnterTransition =
-            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
 
         getCurrentActivity()?.setSupportActionBar(binding.toolbar)
 

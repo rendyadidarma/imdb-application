@@ -30,6 +30,9 @@
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:itemBackground="@color/mustard_yellow"
+        app:itemTextColor="@color/bottom_nav_foreground"
+        app:itemIconTint="@color/bottom_nav_foreground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/nav_item" />
 

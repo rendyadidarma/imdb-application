@@ -33,12 +33,4 @@ class DetailViewModel @Inject constructor(
             it.value
         }
     }
-
-//    val movieInDetail = movieRepository.getDetail(args.movieId).map { it.value }.
-//        stateIn(
-//            viewModelScope,
-//            SharingStarted.WhileSubscribed(),
-//            null
-//        )
-
 }

@@ -19,36 +19,9 @@ class HomeViewModel @Inject constructor(
     private val movieRepository: MovieRepository
 ) : ViewModel() {
 
-//    private var _movieList = MutableStateFlow<UIState<List<Movie>>>(UIState(StateLoad.Loading, listOf()))
-
-//    val movieList: StateFlow<UIState<List<Movie>>> get() = _movieList
-
     private var _movieList = MutableSharedFlow<UIState<List<Movie>>>()
 
     val movieList: SharedFlow<UIState<List<Movie>>> get() = _movieList
-
-//    init {
-//        refreshDataListMovie()
-//    }
-
-    var fragmentState : Boolean = false
-
-//    val isDatabaseEmpty = movieRepository
-//        .isDatabaseEmpty()
-//        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
-//
-//    suspend fun refreshDataFromRepoLocals(isDbEmpty: Boolean)
-//    : Flow<EmptyResponseWrapper<List<Movie>>> {
-//        _alreadyHasData.value = false
-//        _dbEmpty.value = isDbEmpty
-//        val something = movieRepository.getMovies(isDbEmpty)
-//            .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-//
-//        return movieRepository.getMovies(isDbEmpty)
-//    }
-
-
-
     fun refreshDataListMovie() {
         viewModelScope.launch {
             try {
@@ -61,29 +34,9 @@ class HomeViewModel @Inject constructor(
                 } else if(databaseEmptyStatus || response.isInternetAvailable == StateOnline.NetworkUnavailable){
                     _movieList.emit(UIState(StateLoad.Error, null))
                 }
-            } catch (e: java.lang.Exception) {
+            } catch (e: Exception) {
                 _movieList.emit(UIState(StateLoad.Error, null))
             }
         }
     }
-
-
-//    private fun refreshDataFromRepoLocal(isDbEmpty : Boolean) {
-//        viewModelScope.launch {
-//            _alreadyHasData.value = false
-//            try {
-//                val list = movieRepository.getMovies(isDbEmpty)
-//
-//                _dbEmpty.value = isDbEmpty
-//                _movieList.value = list.
-//
-//                _alreadyHasData.value = true
-//            } catch (error: IOException) {
-//                Log.w("ErrorInHomeViewModel", "Error Detected in Home View Model Refresh fun")
-//            }
-//        }
-//    }
-//
-//    fun refreshDataFromRepo() = refreshDataFromRepoLocal()
-
 }
