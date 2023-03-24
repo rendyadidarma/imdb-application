@@ -1,16 +1,17 @@
 package com.example.imdb_application.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.repository.MovieRepository
+import com.example.imdb_application.data.sealed.StateLoad
+import com.example.imdb_application.data.sealed.StateOnline
+import com.example.imdb_application.data.state.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,50 +19,71 @@ class HomeViewModel @Inject constructor(
     private val movieRepository: MovieRepository
 ) : ViewModel() {
 
-    private var _movieList = MutableStateFlow<List<Movie>>(listOf())
+//    private var _movieList = MutableStateFlow<UIState<List<Movie>>>(UIState(StateLoad.Loading, listOf()))
 
-    val movieList: StateFlow<List<Movie>> get() = _movieList
+//    val movieList: StateFlow<UIState<List<Movie>>> get() = _movieList
 
-    private var _alreadyHasData = MutableStateFlow(false)
+    private var _movieList = MutableSharedFlow<UIState<List<Movie>>>()
 
-    val alreadyHasData: StateFlow<Boolean> get() = _alreadyHasData
+    val movieList: SharedFlow<UIState<List<Movie>>> get() = _movieList
 
-    private var _dbEmpty = MutableStateFlow<Boolean>(true)
+//    init {
+//        refreshDataListMovie()
+//    }
 
-    val dbEmpty: StateFlow<Boolean> get() = _dbEmpty
+    var fragmentState : Boolean = false
 
-    init {
-        refreshDataFromRepo()
-    }
+//    val isDatabaseEmpty = movieRepository
+//        .isDatabaseEmpty()
+//        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
+//
+//    suspend fun refreshDataFromRepoLocals(isDbEmpty: Boolean)
+//    : Flow<EmptyResponseWrapper<List<Movie>>> {
+//        _alreadyHasData.value = false
+//        _dbEmpty.value = isDbEmpty
+//        val something = movieRepository.getMovies(isDbEmpty)
+//            .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+//
+//        return movieRepository.getMovies(isDbEmpty)
+//    }
 
-    fun insertDetailToRoom(id: String) {
+
+
+    fun refreshDataListMovie() {
         viewModelScope.launch {
             try {
-                movieRepository.refreshDetail(id)
-            } catch (err: IOException) {
-                Log.w("detailRefreshData", "Error Detected")
-            }
-        }
-    }
+                val databaseEmptyStatus = movieRepository.isDatabaseEmpty().first()
+                _movieList.emit(UIState(StateLoad.Loading, null))
+                val response = movieRepository.getMovies(databaseEmptyStatus).first()
+                if (databaseEmptyStatus.not()) {
 
-    private fun refreshDataFromRepoLocal() {
-        viewModelScope.launch {
-            _alreadyHasData.value = false
-            try {
-                val list = movieRepository.getMovies()
-                if (list != null) {
-                    _movieList.value = list.first()
-                    _dbEmpty.value = false
-                } else {
-                    _dbEmpty.value = true
+                    _movieList.emit(UIState(StateLoad.Success, response.value))
+                } else if(databaseEmptyStatus || response.isInternetAvailable == StateOnline.NetworkUnavailable){
+                    _movieList.emit(UIState(StateLoad.Error, null))
                 }
-                _alreadyHasData.value = true
-            } catch (error: IOException) {
-                Log.w("ErrorInHomeViewModel", "Error Detected in Home View Model Refresh fun")
+            } catch (e: java.lang.Exception) {
+                _movieList.emit(UIState(StateLoad.Error, null))
             }
         }
     }
 
-    fun refreshDataFromRepo() = refreshDataFromRepoLocal()
+
+//    private fun refreshDataFromRepoLocal(isDbEmpty : Boolean) {
+//        viewModelScope.launch {
+//            _alreadyHasData.value = false
+//            try {
+//                val list = movieRepository.getMovies(isDbEmpty)
+//
+//                _dbEmpty.value = isDbEmpty
+//                _movieList.value = list.
+//
+//                _alreadyHasData.value = true
+//            } catch (error: IOException) {
+//                Log.w("ErrorInHomeViewModel", "Error Detected in Home View Model Refresh fun")
+//            }
+//        }
+//    }
+//
+//    fun refreshDataFromRepo() = refreshDataFromRepoLocal()
 
 }

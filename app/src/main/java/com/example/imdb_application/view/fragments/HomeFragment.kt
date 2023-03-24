@@ -1,6 +1,7 @@
 package com.example.imdb_application.view.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.imdb_application.R
+import com.example.imdb_application.data.sealed.StateLoad
 import com.example.imdb_application.data.utils.BindUtils
 import com.example.imdb_application.data.utils.Router
 import com.example.imdb_application.databinding.FragmentHomeBinding
@@ -22,14 +24,14 @@ import com.example.imdb_application.view.adapter.MovieListener
 import com.example.imdb_application.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
     val viewModel by viewModels<HomeViewModel>()
-    
+
     private var _binding: FragmentHomeBinding? = null
 
     private val binding get() = _binding!!
@@ -51,37 +53,53 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         binding.homeRecyclerView.adapter = MovieListAdapter(
             MovieListener { movie ->
-
-                viewModel.insertDetailToRoom(movie.id)
                 Router.routeHomeFragmentToDetailFragment(movie, findNavController())
                 getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
-
             }
         )
 
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.refreshDataFromRepo()
+            viewModel.refreshDataListMovie()
             swipe_refresh.isRefreshing = false
         }
-
         bindObservables()
+
+        viewModel.refreshDataListMovie()
     }
 
     private fun bindObservables() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 launch {
-                    viewModel.movieList.collect {
-                        BindUtils.bindRecyclerView(binding.homeRecyclerView, it)
+                    viewModel.movieList.collectLatest {
+                        val data = it.value
+
+                        when(it.state) {
+                            StateLoad.Error -> {
+                                binding.emptyState.visibility = View.VISIBLE
+                                binding.homeRecyclerView.visibility = View.GONE
+                                binding.shimmerFrameLayout.visibility = View.GONE
+                                binding.shimmerFrameLayout.stopShimmer()
+                            }
+
+                            StateLoad.Loading -> {
+                                binding.emptyState.visibility = View.GONE
+                                binding.homeRecyclerView.visibility = View.GONE
+                                binding.shimmerFrameLayout.visibility = View.VISIBLE
+                                binding.shimmerFrameLayout.startShimmer()
+                            }
+
+                            StateLoad.Success -> {
+                                BindUtils.bindRecyclerView(binding.homeRecyclerView, data)
+                                binding.emptyState.visibility = View.GONE
+                                binding.homeRecyclerView.visibility = View.VISIBLE
+                                binding.shimmerFrameLayout.visibility = View.GONE
+                                binding.shimmerFrameLayout.stopShimmer()
+                            }
+                        }
+
                     }
                 }
-
-                launch {
-                    viewModel.alreadyHasData.collect{
-                        BindUtils.bindShimmer(binding.shimmerFrameLayout, it, null, null, binding!!.emptyState, viewModel.dbEmpty.first())
-                    }
-                }
-
             }
         }
     }
@@ -92,10 +110,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
+        Log.d("FLAG", "onCreateView")
         getCurrentActivity()?.getBottomNavView()?.visibility = View.VISIBLE
+
         _binding = FragmentHomeBinding.inflate(inflater)
         return binding.root
     }
+
+
 
     private fun getCurrentActivity(): MainActivity? {
         return (activity as? MainActivity)

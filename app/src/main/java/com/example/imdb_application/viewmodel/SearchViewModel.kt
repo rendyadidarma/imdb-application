@@ -31,6 +31,10 @@ class SearchViewModel @Inject constructor(
 
     val searchStatus : StateFlow<STATUS> get() = _searchStatus
 
+    fun setStatusFromUI(value : STATUS) {
+        _searchStatus.value = value
+    }
+
     fun fetchSearchData(keyword : String) {
         viewModelScope.launch {
             _searchStatus.value = STATUS.ON_LOAD

@@ -19,6 +19,7 @@ import com.example.imdb_application.data.utils.onKeywordValueChange
 import com.example.imdb_application.databinding.FragmentSearchBinding
 import com.example.imdb_application.view.adapter.MovieListAdapter
 import com.example.imdb_application.view.adapter.MovieListener
+import com.example.imdb_application.viewmodel.STATUS
 import com.example.imdb_application.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -51,10 +52,12 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         }
 
         onKeywordValueChange(binding.searchView, SEARCH_DEBOUNCE_TIME) { keyword ->
-            viewModel.fetchSearchData(keyword)
+            if(keyword.isEmpty().not()) {
+                viewModel.fetchSearchData(keyword)
+            } else {
+                viewModel.setStatusFromUI(STATUS.NO_DATA)
+            }
         }
-
-
 
         binding.searchRecyclerView.adapter = MovieListAdapter(
             MovieListener {
@@ -75,13 +78,20 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
                 launch {
                     viewModel.searchStatus.collect {
-                        BindUtils.bindShimmer(binding.shimmerFrameLayoutSearch, null, it, binding.searchRecyclerView, binding.noDataPlaceHolder, null)
+                        BindUtils.bindShimmer(binding.shimmerFrameLayoutSearch, it, binding.searchRecyclerView, binding.noDataPlaceHolder)
                     }
                 }
 
                 launch {
                     viewModel.keyword.collect {
-                        binding.searchView.setText(it)
+                        val textSearch = binding.searchView.text.toString()
+                        if(textSearch.isEmpty()) {
+                            binding.noDataPlaceHolder.visibility = View.VISIBLE
+                            binding.searchRecyclerView.visibility = View.GONE
+                        } else {
+                            binding.searchView.setText(it)
+                        }
+
                     }
                 }
 

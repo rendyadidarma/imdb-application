@@ -7,6 +7,7 @@ import com.example.imdb_application.data.model.MovieDetail
 import com.example.imdb_application.data.remote.dto.MovieDto
 import com.example.imdb_application.data.remote.dto.MovieDtoSearch
 import com.example.imdb_application.data.remote.dto.detail.DetailDto
+import com.example.imdb_application.data.sealed.StateOnline
 import com.example.imdb_application.data.state.NetworkResponseWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -108,16 +109,19 @@ object MovieObjectMapper {
         }
     }
 
-    fun mapMovieDtoListToFlowMovieList(movieDto: List<MovieDto>): Flow<List<Movie>> {
+    fun mapMovieDtoListToFlowMovieList(movieDto: List<MovieDto>, state: StateOnline): Flow<NetworkResponseWrapper<List<Movie>>> {
         return flow {
             emit(
-                movieDto.map {
-                    Movie(
-                        fullTitle = it.title,
-                        id = it.id,
-                        image = it.image
-                    )
-                }
+                NetworkResponseWrapper(
+                    state,
+                    movieDto.map {
+                        Movie(
+                            fullTitle = it.title,
+                            id = it.id,
+                            image = it.image
+                        )
+                    }
+                )
             )
         }
     }
@@ -125,7 +129,10 @@ object MovieObjectMapper {
     fun mapNetworkResponseWrapperDetailAsFlow(networkResponseWrapper: NetworkResponseWrapper<MovieDetail>): Flow<NetworkResponseWrapper<MovieDetail>> {
         return flow {
             emit(
-                NetworkResponseWrapper(isInternetAvailable = networkResponseWrapper.isInternetAvailable, value = networkResponseWrapper.value)
+                NetworkResponseWrapper(
+                    isInternetAvailable = networkResponseWrapper.isInternetAvailable,
+                    value = networkResponseWrapper.value
+                )
             )
         }
     }

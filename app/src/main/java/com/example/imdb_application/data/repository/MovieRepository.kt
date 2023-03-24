@@ -6,7 +6,7 @@ import com.example.imdb_application.data.state.NetworkResponseWrapper
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {
-    suspend fun getMovies() : Flow<List<Movie>>?
+    suspend fun getMovies(isDatabaseEmpty : Boolean) : Flow<NetworkResponseWrapper<List<Movie>>>
     suspend fun getMoviesFromNetwork(): List<Movie>
     suspend fun getDetail(isDetailEmpty : Boolean, id: String): Flow<NetworkResponseWrapper<MovieDetail>>
     suspend fun refreshDetail(id : String)

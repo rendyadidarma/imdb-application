@@ -32,19 +32,18 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        sharedElementEnterTransition =
+            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
 
         getCurrentActivity()?.setSupportActionBar(binding.toolbar)
 
         binding.toolbar.setNavigationOnClickListener {
             getCurrentActivity()?.onSupportNavigateUp()
         }
-//
-//        viewModel.setMovieInDetail(args.movieId)
         bindObservables()
     }
 
-    private var _binding : FragmentDetailBinding? = null
+    private var _binding: FragmentDetailBinding? = null
 
     private val binding get() = _binding!!
 
@@ -72,17 +71,17 @@ class DetailFragment : Fragment() {
                 launch {
                     val isDetailEmpty = viewModel.isDetailEmpty
 
-                    isDetailEmpty.flatMapLatest {
-                        viewModel.movieInDetail(it)
-                    }.collectLatest {
-                        if(it != null) {
-                            binding.nestedScrollView.visibility = View.VISIBLE
-                            binding.foundAProblem.visibility = View.GONE
-                            bindLayout(it)
-                        } else {
-                            binding.nestedScrollView.visibility = View.GONE
-                            binding.foundAProblem.visibility = View.VISIBLE
-                        }
+                    isDetailEmpty
+                        .flatMapLatest { viewModel.movieInDetail(it) }
+                        .collectLatest {
+                            if (it != null) {
+                                binding.nestedScrollView.visibility = View.VISIBLE
+                                binding.foundAProblem.visibility = View.GONE
+                                bindLayout(it)
+                            } else {
+                                binding.nestedScrollView.visibility = View.GONE
+                                binding.foundAProblem.visibility = View.VISIBLE
+                            }
                     }
 
                 }
