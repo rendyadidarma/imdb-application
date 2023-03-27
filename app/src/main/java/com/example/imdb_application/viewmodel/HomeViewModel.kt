@@ -10,7 +10,6 @@ import com.example.imdb_application.data.state.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,14 +24,16 @@ class HomeViewModel @Inject constructor(
     fun refreshDataListMovie() {
         viewModelScope.launch {
             try {
-                val databaseEmptyStatus = movieRepository.isDatabaseEmpty().first()
-                _movieList.emit(UIState(StateLoad.Loading, null))
-                val response = movieRepository.getMovies(databaseEmptyStatus).first()
-                if (databaseEmptyStatus.not()) {
+                movieRepository.isDatabaseEmpty().collect { databaseEmptyStatus ->
+                    _movieList.emit(UIState(StateLoad.Loading, null))
 
-                    _movieList.emit(UIState(StateLoad.Success, response.value))
-                } else if(databaseEmptyStatus || response.isInternetAvailable == StateOnline.NetworkUnavailable){
-                    _movieList.emit(UIState(StateLoad.Error, null))
+                    movieRepository.getMovies(databaseEmptyStatus).collect { response ->
+                        if (databaseEmptyStatus.not()) {
+                            _movieList.emit(UIState(StateLoad.Success, response.value))
+                        } else if (databaseEmptyStatus || response.isInternetAvailable == StateOnline.NetworkUnavailable) {
+                            _movieList.emit(UIState(StateLoad.Error, null))
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 _movieList.emit(UIState(StateLoad.Error, null))

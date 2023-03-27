@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.repository.MovieRepository
+import com.example.imdb_application.data.sealed.StateOnline
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class STATUS {
-    NO_DATA, HAS_DATA, ON_LOAD
+    NO_DATA, HAS_DATA, ON_LOAD, NO_INET
 }
 
 @HiltViewModel
@@ -40,15 +41,20 @@ class SearchViewModel @Inject constructor(
             _searchStatus.value = STATUS.ON_LOAD
             try {
                 val searchResult = movieRepository.searchMovies(keyword)
-                _searchData.value = searchResult
-                if(_searchData.value.isNotEmpty()) {
-                    _searchStatus.value = STATUS.HAS_DATA
+
+                if(searchResult.isInternetAvailable == StateOnline.NetworkUnavailable) {
+                    _searchStatus.value = STATUS.NO_INET
                 } else {
-                    _searchStatus.value = STATUS.NO_DATA
+                    if(searchResult.value != null) {
+                        _searchData.value = searchResult.value
+                        _searchStatus.value = STATUS.HAS_DATA
+                    } else {
+                        _searchStatus.value = STATUS.NO_DATA
+                    }
                 }
             } catch (e : java.lang.Exception) {
                 _searchData.value = listOf()
-                _searchStatus.value = STATUS.NO_DATA
+                _searchStatus.value = STATUS.NO_INET
             }
         }
     }

@@ -66,8 +66,12 @@ class MovieRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun searchMovies(keyword: String): List<Movie> {
-        return MovieObjectMapper.mapMovieDtoSearchToMovie(network.searchMovie(keyword).moviesForSearch)
+    override suspend fun searchMovies(keyword: String): NetworkResponseWrapper<List<Movie>> {
+        return if(NetworkChecker.isOnline(applicationContext)) {
+            NetworkResponseWrapper(StateOnline.NetworkAvailable, MovieObjectMapper.mapMovieDtoSearchToMovie(network.searchMovie(keyword).moviesForSearch))
+        } else {
+            NetworkResponseWrapper(StateOnline.NetworkUnavailable, null)
+        }
     }
 
     override fun isDatabaseEmpty(): Flow<Boolean> {
@@ -117,6 +121,44 @@ class MovieRepositoryImpl @Inject constructor(
                     val responseWrapper =
                         NetworkResponseWrapper(StateOnline.NetworkAvailable, movieDetail)
                     responseWrapper
+                }
+            }
+
+        }
+    }
+
+    override suspend fun getDetailNotReturnNetworkState(
+        isDetailEmpty: Boolean,
+        id: String
+    ): Flow<MovieDetail?> {
+
+        val networkIsAvailableAndDataNotFound =
+            NetworkChecker.isOnline(applicationContext) && isDetailEmpty
+        val networkIsUnavailableAndDataNotFound =
+            !NetworkChecker.isOnline(applicationContext) && isDetailEmpty
+
+        when {
+            networkIsAvailableAndDataNotFound -> {
+                val detail = network.getDetail(id)
+
+                val movieDetailFromNetwork =
+                    MovieObjectMapper.mapDetailDtoToMovieDetail(detail)
+
+                withContext(Dispatchers.IO) {
+                    databaseDao.insertDetail(MovieObjectMapper.mapDetailDtoToDetailEntity(detail))
+                }
+
+                return MovieObjectMapper.mapDetailAsFlow(movieDetailFromNetwork)
+            }
+
+            networkIsUnavailableAndDataNotFound -> {
+                return MovieObjectMapper.mapDetailAsFlow(movieDetail = null)
+            }
+
+            else -> {
+                return databaseDao.getDetail(id).map {
+                    val movieDetail = MovieObjectMapper.mapDetailEntityToMovieDetail(it)
+                    movieDetail
                 }
             }
 

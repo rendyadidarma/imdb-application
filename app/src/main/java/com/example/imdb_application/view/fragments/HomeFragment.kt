@@ -36,6 +36,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.homeRecyclerView.adapter = MovieListAdapter(
             MovieListener { movie ->
                 Router.routeHomeFragmentToDetailFragment(movie, findNavController())
@@ -47,6 +48,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             viewModel.refreshDataListMovie()
             swipe_refresh.isRefreshing = false
         }
+
         bindObservables()
         Log.w("Flag", "Onviewcreated")
         viewModel.refreshDataListMovie()

@@ -64,6 +64,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 Router.routeSearchFragmentToDetailFragment(movie = it, findNavController())
             }
         )
+
         bindObservables()
     }
 

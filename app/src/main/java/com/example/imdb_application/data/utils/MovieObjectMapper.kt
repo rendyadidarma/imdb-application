@@ -137,6 +137,14 @@ object MovieObjectMapper {
         }
     }
 
+    fun mapDetailAsFlow(movieDetail: MovieDetail?) : Flow<MovieDetail?> {
+        return flow {
+            emit(
+                movieDetail
+            )
+        }
+    }
+
     fun mapMovieDtoListToMovieList(movieDtoSearch: List<MovieDto>): List<Movie> {
         return movieDtoSearch.map {
             Movie(

@@ -12,7 +12,6 @@ import com.example.imdb_application.viewmodel.STATUS
 import com.facebook.shimmer.ShimmerFrameLayout
 
 object BindUtils {
-
     fun bindImage(imgView: ImageView, imgUrl: String?) {
         imgUrl?.let {
             val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
@@ -30,8 +29,6 @@ object BindUtils {
         adapter.submitList(data)
     }
 
-
-
     fun bindShimmer(shimmerFrameLayout: ShimmerFrameLayout, onLoadSearch: STATUS? = null, recyclerViews: RecyclerView? = null,
                     imageViews : ImageView? = null) {
         if (onLoadSearch != null) {
@@ -45,14 +42,23 @@ object BindUtils {
 
                 STATUS.NO_DATA -> {
                     imageViews?.visibility = View.VISIBLE
+                    imageViews?.setImageResource(R.drawable.search_fragment_icon_woman_searching)
                     recyclerViews?.visibility = View.GONE
                     shimmerFrameLayout.visibility = View.GONE
                     shimmerFrameLayout.stopShimmer()
                 }
 
-                else -> {
+                STATUS.HAS_DATA -> {
                     recyclerViews?.visibility = View.VISIBLE
                     imageViews?.visibility = View.GONE
+                    shimmerFrameLayout.visibility = View.GONE
+                    shimmerFrameLayout.stopShimmer()
+                }
+
+                else -> {
+                    imageViews?.visibility = View.VISIBLE
+                    imageViews?.setImageResource(R.drawable.sorry_found_problem_removebg_preview)
+                    recyclerViews?.visibility = View.GONE
                     shimmerFrameLayout.visibility = View.GONE
                     shimmerFrameLayout.stopShimmer()
                 }
