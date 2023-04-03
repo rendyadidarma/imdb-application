@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.imdb_application.data.model.Movie
-import com.example.imdb_application.data.utils.BindUtils
+import com.example.imdb_application.data.utils.ImageLoader
 import com.example.imdb_application.databinding.ListViewItemBinding
 
 class MovieListAdapter(private val clickListener: MovieListener) : ListAdapter<Movie, MovieListAdapter.MovieViewHolder>(DiffCallback){
@@ -23,7 +23,7 @@ class MovieListAdapter(private val clickListener: MovieListener) : ListAdapter<M
     class MovieViewHolder(private var binding: ListViewItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind (movieListener: MovieListener,Movie: Movie) {
             binding.movieTitle.text = Movie.fullTitle
-            BindUtils.bindImage(binding.movieImage, Movie.image)
+            ImageLoader.loadImage(binding.root.context, Movie.image, binding.movieImage)
             binding.itemCard.setOnClickListener {movieListener.onClick(Movie) }
         }
     }

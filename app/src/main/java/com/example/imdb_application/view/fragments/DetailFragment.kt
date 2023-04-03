@@ -12,29 +12,28 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.imdb_application.R
 import com.example.imdb_application.data.model.MovieDetail
-import com.example.imdb_application.data.utils.BindUtils
+import com.example.imdb_application.data.utils.ImageLoader
 import com.example.imdb_application.databinding.FragmentDetailBinding
 import com.example.imdb_application.view.MainActivity
 import com.example.imdb_application.viewmodel.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DetailFragment : Fragment(R.layout.fragment_detail) {
+class DetailFragment: Fragment(R.layout.fragment_detail) {
 
     val viewModel by viewModels<DetailViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
         getCurrentActivity()?.setSupportActionBar(binding.toolbar)
 
         binding.toolbar.setNavigationOnClickListener {
             getCurrentActivity()?.onSupportNavigateUp()
         }
+        viewModel.getDetailMovie()
         bindObservables()
     }
 
@@ -64,21 +63,16 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 launch {
-                    val isDetailEmpty = viewModel.isDetailEmpty
-
-                    isDetailEmpty
-                        .flatMapLatest { viewModel.movieInDetail(it) }
-                        .collectLatest {
-                            if (it != null) {
-                                binding.nestedScrollView.visibility = View.VISIBLE
-                                binding.foundAProblem.visibility = View.GONE
-                                bindLayout(it)
-                            } else {
-                                binding.nestedScrollView.visibility = View.GONE
-                                binding.foundAProblem.visibility = View.VISIBLE
-                            }
+                    viewModel.detailMovie.collect {
+                        if (it != null) {
+                            binding.nestedScrollView.visibility = View.VISIBLE
+                            binding.foundAProblem.visibility = View.GONE
+                            bindLayout(it)
+                        } else {
+                            binding.nestedScrollView.visibility = View.GONE
+                            binding.foundAProblem.visibility = View.VISIBLE
+                        }
                     }
-
                 }
 
             }
@@ -88,7 +82,9 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
     private fun bindLayout(movieDetail: MovieDetail) {
         with(movieDetail) {
             binding.detailTitleView.title = title
-            BindUtils.bindImage(binding.detailImageView, image)
+            context?.let {safeContext ->
+                ImageLoader.loadImage(safeContext, image, binding.detailImageView)
+            }
             binding.detailPlotView.text = plot
             binding.detailReleaseView.text = releaseState
             binding.detailRuntimeView.text = runtimeStr

@@ -22,6 +22,7 @@ interface MovieDao {
 
     @Query("select (select count(*) from movie_detail where id=:id) == 0")
     fun isDetailEmpty(id : String) : Flow<Boolean>
+
 }
 
 @Database(entities = [MovieEntity::class, DetailEntity::class], version = 3)

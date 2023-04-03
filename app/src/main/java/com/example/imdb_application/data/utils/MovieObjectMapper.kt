@@ -145,14 +145,4 @@ object MovieObjectMapper {
         }
     }
 
-    fun mapMovieDtoListToMovieList(movieDtoSearch: List<MovieDto>): List<Movie> {
-        return movieDtoSearch.map {
-            Movie(
-                fullTitle = it.title,
-                id = it.id,
-                image = it.image
-            )
-        }
-    }
-
 }

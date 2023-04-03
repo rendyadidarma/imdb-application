@@ -40,19 +40,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding.homeRecyclerView.adapter = MovieListAdapter(
             MovieListener { movie ->
                 Router.routeHomeFragmentToDetailFragment(movie, findNavController())
-                getCurrentActivity()?.getBottomNavView()?.visibility = View.GONE
             }
         )
-
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.refreshDataListMovie()
             swipe_refresh.isRefreshing = false
         }
 
         bindObservables()
-        Log.w("Flag", "Onviewcreated")
         viewModel.refreshDataListMovie()
-
     }
 
     private fun bindObservables() {
@@ -123,4 +119,5 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         super.onDestroyView()
         _binding = null
     }
+
 }

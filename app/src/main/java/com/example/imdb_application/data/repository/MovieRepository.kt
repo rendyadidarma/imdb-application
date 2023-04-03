@@ -7,19 +7,17 @@ import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {
     suspend fun getMovies(isDatabaseEmpty: Boolean): Flow<NetworkResponseWrapper<List<Movie>>>
-    suspend fun getMoviesFromNetwork(): List<Movie>
-    suspend fun getDetail(
-        isDetailEmpty: Boolean,
-        id: String
-    ): Flow<NetworkResponseWrapper<MovieDetail>>
-
     suspend fun getDetailNotReturnNetworkState(
         isDetailEmpty: Boolean,
         id: String
     ): Flow<MovieDetail?>
 
-    suspend fun refreshDetail(id: String)
     fun isDetailEmpty(id: String): Flow<Boolean>
     fun isDatabaseEmpty(): Flow<Boolean>
-    suspend fun searchMovies(keyword: String): NetworkResponseWrapper<List<Movie>>
+    suspend fun searchMovies(keyword: String): Flow<NetworkResponseWrapper<List<Movie>>>
 }
+
+//suspend fun getDetail(
+//    isDetailEmpty: Boolean,
+//    id: String
+//): Flow<NetworkResponseWrapper<MovieDetail>>

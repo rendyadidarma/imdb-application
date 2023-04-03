@@ -2,9 +2,7 @@ package com.example.imdb_application.data.utils
 
 import android.view.View
 import android.widget.ImageView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.example.imdb_application.R
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.view.adapter.MovieListAdapter
@@ -12,15 +10,6 @@ import com.example.imdb_application.viewmodel.STATUS
 import com.facebook.shimmer.ShimmerFrameLayout
 
 object BindUtils {
-    fun bindImage(imgView: ImageView, imgUrl: String?) {
-        imgUrl?.let {
-            val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
-            imgView.load(imgUri) {
-                error(R.drawable.ic_broken_image)
-            }
-        }
-    }
-
     fun bindRecyclerView(
         recyclerView: RecyclerView,
         data: List<Movie>?

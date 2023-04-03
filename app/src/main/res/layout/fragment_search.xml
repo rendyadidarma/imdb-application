@@ -5,7 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragments.SearchFragment">
+    tools:context=".view.fragments.SearchFragment"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    >
 
     <EditText
         android:id="@+id/search_view"
@@ -68,7 +72,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_view" />
+        app:layout_constraintTop_toBottomOf="@id/search_view"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchRecyclerView"

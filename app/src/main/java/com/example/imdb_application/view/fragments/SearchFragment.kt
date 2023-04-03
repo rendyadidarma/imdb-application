@@ -1,31 +1,34 @@
 package com.example.imdb_application.view.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.imdb_application.R
 import com.example.imdb_application.data.utils.BindUtils
 import com.example.imdb_application.data.utils.Router
+import com.example.imdb_application.data.utils.hideKeyboard
 import com.example.imdb_application.data.utils.onKeywordValueChange
 import com.example.imdb_application.databinding.FragmentSearchBinding
+import com.example.imdb_application.view.MainActivity
 import com.example.imdb_application.view.adapter.MovieListAdapter
 import com.example.imdb_application.view.adapter.MovieListener
-import com.example.imdb_application.viewmodel.STATUS
 import com.example.imdb_application.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+
 @AndroidEntryPoint
-class SearchFragment : Fragment(R.layout.fragment_search) {
+class SearchFragment: Fragment(R.layout.fragment_search) {
 
     companion object {
         private const val SEARCH_DEBOUNCE_TIME : Long = 1500
@@ -39,38 +42,39 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val verticalDecorator = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
-        val horizontalDecorator = DividerItemDecoration(activity, DividerItemDecoration.HORIZONTAL)
-
-        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.divider_recycler, null)
-
-        if (drawable != null) {
-            verticalDecorator.setDrawable(drawable)
-            horizontalDecorator.setDrawable(drawable)
-            binding.searchRecyclerView.addItemDecoration(verticalDecorator)
-            binding.searchRecyclerView.addItemDecoration(horizontalDecorator)
-        }
-
-        onKeywordValueChange(binding.searchView, SEARCH_DEBOUNCE_TIME) { keyword ->
-            if(keyword.isEmpty().not()) {
-                viewModel.fetchSearchData(keyword)
-            } else {
-                viewModel.setStatusFromUI(STATUS.NO_DATA)
-            }
-        }
-
         binding.searchRecyclerView.adapter = MovieListAdapter(
             MovieListener {
                 Router.routeSearchFragmentToDetailFragment(movie = it, findNavController())
             }
         )
-
+        searchViewBind(binding.searchView)
         bindObservables()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.w("OnResume", "onResumeCalled")
+    }
+
+    private fun searchViewBind(binding : EditText) {
+        onKeywordValueChange(binding, SEARCH_DEBOUNCE_TIME) { keyword ->
+            if(keyword.isEmpty().not()) {
+                viewModel.fetchSearchData(keyword)
+            }
+//            else {
+//                viewModel.setStatusFromUI(STATUS.NO_DATA)
+//            }
+        }
+        binding.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+            if(hasFocus.not()) {
+                hideKeyboard()
+            }
+        }
     }
 
     private fun bindObservables() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 launch {
                     viewModel.searchData.collect {
                         BindUtils.bindRecyclerView(binding.searchRecyclerView, it)
@@ -85,14 +89,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
                 launch {
                     viewModel.keyword.collect {
-                        val textSearch = binding.searchView.text.toString()
-                        if(textSearch.isEmpty()) {
-                            binding.noDataPlaceHolder.visibility = View.VISIBLE
-                            binding.searchRecyclerView.visibility = View.GONE
-                        } else {
-                            binding.searchView.setText(it)
-                        }
-
+                        binding.searchView.setText(it)
                     }
                 }
 
@@ -104,10 +101,14 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
+        getCurrentActivity()?.getBottomNavView()?.visibility = View.VISIBLE
         _binding = FragmentSearchBinding.inflate(inflater)
 
         return binding.root
+    }
+
+    private fun getCurrentActivity(): MainActivity? {
+        return (activity as? MainActivity)
     }
 
     override fun onDestroyView() {

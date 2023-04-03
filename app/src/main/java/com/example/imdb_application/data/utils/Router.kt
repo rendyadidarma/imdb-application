@@ -6,7 +6,6 @@ import com.example.imdb_application.view.fragments.HomeFragmentDirections
 import com.example.imdb_application.view.fragments.SearchFragmentDirections
 
 object Router {
-
     fun routeHomeFragmentToDetailFragment(movie : Movie, navController: NavController) {
         val action =
             HomeFragmentDirections.actionHomeFragmentToDetailFragment().setMovieId(movie.id)
@@ -18,4 +17,5 @@ object Router {
             SearchFragmentDirections.actionSearchFragmentToDetailFragment().setMovieId(movie.id)
         navController.navigate(action)
     }
+
 }

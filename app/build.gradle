@@ -28,11 +28,11 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "API_KEY", "\"k_psr6zcqm\"")
+            buildConfigField("String", "API_KEY", "\"k_v50vt488\"")
         }
         // k_v50vt488
         release {
-            buildConfigField("String", "API_KEY", "\"k_psr6zcqm\"")
+            buildConfigField("String", "API_KEY", "\"k_v50vt488\"")
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -126,4 +126,17 @@ dependencies {
     implementation 'com.google.android.material:material:1.6.0'
 
     implementation 'com.android.databinding:viewbinding:7.4.2'
+
+    testImplementation 'junit:junit:4.13.2'
+    // Optional -- Robolectric environment
+    testImplementation 'androidx.test:core:1.5.0'
+    // Optional -- Mockito framework
+    testImplementation 'org.mockito:mockito-core:3.4.6'
+
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+
+    testImplementation 'app.cash.turbine:turbine:0.12.3'
+
+    testImplementation "io.mockk:mockk:1.13.1"
+
 }
