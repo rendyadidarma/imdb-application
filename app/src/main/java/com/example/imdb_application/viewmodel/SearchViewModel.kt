@@ -27,7 +27,7 @@ class SearchViewModel @Inject constructor(
     private var _searchData = MutableStateFlow<List<Movie>>(listOf())
     val searchData: StateFlow<List<Movie>> get() = _searchData
 
-    private var _searchStatus = MutableStateFlow(STATUS.ON_LOAD)
+    private var _searchStatus = MutableStateFlow(STATUS.NO_DATA)
     val searchStatus : StateFlow<STATUS> get() = _searchStatus
 
     fun fetchSearchData(keyword : String) {

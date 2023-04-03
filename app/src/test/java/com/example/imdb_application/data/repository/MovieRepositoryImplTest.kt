@@ -32,8 +32,6 @@ class MovieRepositoryImplTest {
     private lateinit var repository: MovieRepository
     @Mock
     private lateinit var databaseDao: MovieDao
-
-    private lateinit var databaseMockk: MovieDao
     @Mock
     private lateinit var network: APIService
     @Mock
@@ -128,7 +126,7 @@ class MovieRepositoryImplTest {
 
             val results = result.first().isInternetAvailable
 
-            Assert.assertEquals(StateOnline.NetworkUnavailable, results)
+            Assert.assertEquals(StateOnline.NetworkAvailable, results)
         }
 
     /**

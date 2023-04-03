@@ -24,15 +24,16 @@ class HomeViewModel @Inject constructor(
     val movieList = _movieList.asSharedFlow()
 
     fun refreshDataListMovie() {
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 movieRepository.isDatabaseEmpty().collect { databaseEmptyStatus ->
                     _movieList.emit(UIState(StateLoad.Loading, null))
 
                     movieRepository.getMovies(databaseEmptyStatus).collect { response ->
-                        if (databaseEmptyStatus.not()) {
+                        if (databaseEmptyStatus.not() || response.isInternetAvailable == StateOnline.NetworkAvailable) {
                             _movieList.emit(UIState(StateLoad.Success, response.value))
-                        } else if (databaseEmptyStatus || response.isInternetAvailable == StateOnline.NetworkUnavailable) {
+                        } else if (databaseEmptyStatus && response.isInternetAvailable == StateOnline.NetworkUnavailable) {
                             _movieList.emit(UIState(StateLoad.Error, null))
                         }
                     }
@@ -41,6 +42,7 @@ class HomeViewModel @Inject constructor(
                 _movieList.emit(UIState(StateLoad.Error, null))
             }
         }
+
     }
 
 

@@ -2,6 +2,7 @@
 
 package com.example.imdb_application.viewmodel
 
+import app.cash.turbine.test
 import com.example.imdb_application.TestCoroutineRule
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.repository.MovieRepository
@@ -47,9 +48,14 @@ class SearchViewModelTest {
 
         `when`(repository.searchMovies("string")).thenAnswer {throw Exception()}
 
-        viewModel.fetchSearchData("string")
+        viewModel.searchStatus.test {
+            viewModel.fetchSearchData("string")
+            Assert.assertEquals(STATUS.NO_DATA, awaitItem())
+            Assert.assertEquals(STATUS.ON_LOAD, awaitItem())
+            Assert.assertEquals(STATUS.NO_INET, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
 
-        Assert.assertEquals(STATUS.NO_INET, viewModel.searchStatus.value)
         Assert.assertEquals(viewModel.searchData.value, listOf<List<Movie>>())
     }
 
