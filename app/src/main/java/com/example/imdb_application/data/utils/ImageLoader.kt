@@ -21,8 +21,4 @@ object ImageLoader {
 
         view.load(url, imgLoader)
     }
-
-    fun loadImageWithCallback(context: Context, url: String, errorCallback: () -> Unit) {
-        // todo here
-    }
 }
