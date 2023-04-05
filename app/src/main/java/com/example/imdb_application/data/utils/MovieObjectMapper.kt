@@ -42,6 +42,8 @@ object MovieObjectMapper {
         )
     }
 
+
+
     fun mapDetailDtoToDetailEntity(detailDto: DetailDto): DetailEntity {
         return DetailEntity(
             contentRating = detailDto.contentRating,
@@ -141,6 +143,16 @@ object MovieObjectMapper {
         return flow {
             emit(
                 movieDetail
+            )
+        }
+    }
+
+    fun mapDetailEntityListToMovieList(detailEntity: List<DetailEntity>): List<Movie> {
+        return detailEntity.map {
+            Movie(
+                fullTitle = it.fullTitle ?: "",
+                id = it.id,
+                image = it.image ?: ""
             )
         }
     }

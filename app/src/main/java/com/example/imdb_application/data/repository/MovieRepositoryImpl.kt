@@ -1,6 +1,7 @@
 package com.example.imdb_application.data.repository
 
 import android.content.Context
+import com.example.imdb_application.data.local.database.DetailEntity
 import com.example.imdb_application.data.local.database.MovieDao
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.model.MovieDetail
@@ -10,6 +11,9 @@ import com.example.imdb_application.data.state.NetworkResponseWrapper
 import com.example.imdb_application.data.utils.MovieObjectMapper
 import com.example.imdb_application.data.utils.NetworkChecker
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -120,6 +124,13 @@ class MovieRepositoryImpl @Inject constructor(
 
         }
     }
+
+    override fun getAllDetailData() : Observable<List<DetailEntity>> {
+        return databaseDao.getAllDetail()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
 }
 
 //override suspend fun getDetail(

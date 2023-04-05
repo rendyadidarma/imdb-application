@@ -18,6 +18,10 @@ import com.example.imdb_application.data.state.NetworkResponseWrapper
 import com.example.imdb_application.data.utils.MovieObjectMapper
 import com.example.imdb_application.data.utils.NetworkChecker
 import io.mockk.*
+import io.reactivex.Observable
+import io.reactivex.android.plugins.RxAndroidPlugins
+import io.reactivex.observers.TestObserver
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runBlockingTest
@@ -26,6 +30,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations.openMocks
+
 
 class MovieRepositoryImplTest {
 
@@ -44,8 +49,11 @@ class MovieRepositoryImplTest {
     fun setUp() {
         openMocks(this)
         mockkObject(NetworkChecker)
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         repository = MovieRepositoryImpl(databaseDao, network, context)
     }
+
+
 
     @After
     fun teardown() {
@@ -273,6 +281,17 @@ class MovieRepositoryImplTest {
         repository.getDetailNotReturnNetworkState(true, id)
 
         Mockito.verify(databaseDao).insertDetail(MovieObjectMapper.mapDetailDtoToDetailEntity(expected))
+    }
+
+    @Test
+    fun `test getAllDetailData return observable`() {
+        val testObserver = TestObserver<List<DetailEntity>>()
+        val temp : Observable<List<DetailEntity>> = Observable.just(listOf(DetailEntity()))
+        `when`(databaseDao.getAllDetail()).thenReturn(temp)
+
+        repository.getAllDetailData().subscribe(testObserver)
+
+        testObserver.assertSubscribed()
     }
 
 }

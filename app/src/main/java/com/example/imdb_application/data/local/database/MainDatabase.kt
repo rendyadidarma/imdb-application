@@ -1,6 +1,7 @@
 package com.example.imdb_application.data.local.database
 
 import androidx.room.*
+import io.reactivex.Observable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -14,7 +15,7 @@ interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE, entity = MovieEntity::class)
     fun insertAll(movies: List<MovieEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE, entity = DetailEntity::class)
+    @Insert(onConflict = OnConflictStrategy.REPLACE, entity = DetailEntity::class)
     fun insertDetail(detail: DetailEntity)
 
     @Query("select (select count(*) from movie_table) == 0")
@@ -23,6 +24,8 @@ interface MovieDao {
     @Query("select (select count(*) from movie_detail where id=:id) == 0")
     fun isDetailEmpty(id : String) : Flow<Boolean>
 
+    @Query("select * from movie_detail")
+    fun getAllDetail() : Observable<List<DetailEntity>>
 }
 
 @Database(entities = [MovieEntity::class, DetailEntity::class], version = 3)

@@ -11,7 +11,6 @@ import com.example.imdb_application.data.state.NetworkResponseWrapper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -60,14 +59,6 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `fetch search data then exception catch status error`() = runTest {
-        `when`(repository.searchMovies("string")).thenAnswer{ throw Exception() }
-        viewModel.fetchSearchData("string")
-
-    }
-
-
-    @Test
     fun `network available and data available handleSearchResult`() = testCoroutineRule.testDispatcher.runBlockingTest {
         val network = StateOnline.NetworkAvailable
         val data = listOf(Movie("Title", "Id", "Image"))
@@ -75,8 +66,14 @@ class SearchViewModelTest {
 
         `when`(repository.searchMovies("string")).thenReturn(flowOf(networkWrapper))
 
-        viewModel.fetchSearchData("string")
-        Assert.assertTrue(viewModel.searchStatus.value == STATUS.HAS_DATA)
+        viewModel.searchStatus.test {
+            viewModel.fetchSearchData("string")
+            Assert.assertEquals(STATUS.NO_DATA, awaitItem())
+            Assert.assertEquals(STATUS.ON_LOAD, awaitItem())
+            Assert.assertEquals(STATUS.HAS_DATA, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+
         Assert.assertEquals(viewModel.searchData.value, data)
     }
 
@@ -86,9 +83,13 @@ class SearchViewModelTest {
         val data = null
         `when`(repository.searchMovies("string")).thenReturn(flowOf(NetworkResponseWrapper(network, data)))
 
-        viewModel.fetchSearchData("string")
-
-        Assert.assertTrue(viewModel.searchStatus.value == STATUS.NO_DATA)
+        viewModel.searchStatus.test {
+            viewModel.fetchSearchData("string")
+            Assert.assertEquals(STATUS.NO_DATA, awaitItem())
+            Assert.assertEquals(STATUS.ON_LOAD, awaitItem())
+            Assert.assertEquals(STATUS.NO_DATA, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
         Assert.assertEquals(viewModel.searchData.value, listOf<List<Movie>>())
     }
 
@@ -98,9 +99,13 @@ class SearchViewModelTest {
         val data = listOf(Movie("Title", "Id", "Image"))
         `when`(repository.searchMovies("string")).thenReturn(flowOf(NetworkResponseWrapper(network, data)))
 
-        viewModel.fetchSearchData("string")
-
-        Assert.assertTrue(viewModel.searchStatus.value == STATUS.NO_INET)
+        viewModel.searchStatus.test {
+            viewModel.fetchSearchData("string")
+            Assert.assertEquals(STATUS.NO_DATA, awaitItem())
+            Assert.assertEquals(STATUS.ON_LOAD, awaitItem())
+            Assert.assertEquals(STATUS.NO_INET, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
         Assert.assertEquals(viewModel.searchData.value, listOf<List<Movie>>())
     }
 

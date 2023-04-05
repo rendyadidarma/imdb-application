@@ -17,4 +17,5 @@
     <string name="search_imdb">Search IMDb</string>
     <string name="no_data_place_holder">noDataPlaceholder</string>
     <string name="movie_item">movie item</string>
+    <string name="history">History</string>
 </resources>

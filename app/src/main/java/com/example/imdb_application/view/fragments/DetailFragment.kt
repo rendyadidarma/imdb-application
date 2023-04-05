@@ -89,7 +89,7 @@ class DetailFragment: Fragment(R.layout.fragment_detail) {
             binding.detailReleaseView.text = releaseState
             binding.detailRuntimeView.text = runtimeStr
             binding.detailContentRatingView.text = contentRating
-            binding.detailImdbRatingView.text = imDbRating
+            binding.detailImdbRatingView.rating = (imDbRating?.toFloat()?.div(10)?.times(5)) ?: 0.0F
             binding.detailImdbCountView.text = String.format("(%s)", imDbRatingCount)
             binding.detailGenresView.text = genres
             binding.detailDirectorsView.text = directors

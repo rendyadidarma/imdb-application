@@ -157,12 +157,20 @@
                         android:layout_weight="1"
                         android:text="@string/imdb_rating" />
 
-                    <TextView
-                        android:id="@+id/detail_imdb_rating_view"
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        tools:text="6.4" />
+                        android:layout_weight="0.5">
+                        <RatingBar
+                            android:id="@+id/detail_imdb_rating_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="?android:attr/ratingBarStyleSmall"
+                            android:numStars="5"
+                            android:stepSize="0.1"
+                            android:isIndicator="true"
+                            tools:text="6.4" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/detail_imdb_count_view"

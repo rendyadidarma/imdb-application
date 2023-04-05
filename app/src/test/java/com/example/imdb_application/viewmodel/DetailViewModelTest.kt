@@ -48,9 +48,10 @@ class DetailViewModelTest {
         }
         `when`(repository.getDetailNotReturnNetworkState(false, movieId)).thenReturn(expectedMovieDetail)
 
-        viewModel.getDetailMovie()
 
+        viewModel.getDetailMovie()
         viewModel.detailMovie.test {
+            awaitItem()
             val emission = awaitItem()
             Assert.assertEquals(MovieDetail( "123"), emission)
             cancelAndConsumeRemainingEvents()

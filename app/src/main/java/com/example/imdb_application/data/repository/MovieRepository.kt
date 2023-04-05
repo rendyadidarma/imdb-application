@@ -1,8 +1,10 @@
 package com.example.imdb_application.data.repository
 
+import com.example.imdb_application.data.local.database.DetailEntity
 import com.example.imdb_application.data.model.Movie
 import com.example.imdb_application.data.model.MovieDetail
 import com.example.imdb_application.data.state.NetworkResponseWrapper
+import io.reactivex.Observable
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {
@@ -15,6 +17,7 @@ interface MovieRepository {
     fun isDetailEmpty(id: String): Flow<Boolean>
     fun isDatabaseEmpty(): Flow<Boolean>
     suspend fun searchMovies(keyword: String): Flow<NetworkResponseWrapper<List<Movie>>>
+    fun getAllDetailData() : Observable<List<DetailEntity>>
 }
 
 //suspend fun getDetail(
